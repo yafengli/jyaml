@@ -108,7 +108,7 @@ public class YamlConfig implements YamlOperations, Cloneable {
 	 * Returns the charset (or encoding) to use for both encoding and decoding.
 	 * The default is UTF-8. See
 	 * http://java.sun.com/j2se/1.4.2/docs/api/java/nio/charset/Charset.html for
-	 * more info.
+	 * more bean.
 	 *
 	 * @return
 	 */

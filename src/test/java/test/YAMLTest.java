@@ -1,8 +1,11 @@
+package test;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.ho.yaml.Yaml;
 import org.junit.Test;
+import test.bean.Info;
 
 public class YAMLTest{
 
@@ -18,7 +21,7 @@ public class YAMLTest{
 		System.out.println(Yaml.dump(test, true));
 
 		//type
-		Info info = Yaml.loadType(dog,Info.class);	
+		Info info = Yaml.loadType(dog, Info.class);
 		System.out.println(Yaml.dump(info, true));
 		System.out.println("Dog: " + test);
 		// We can also load YAML from a file

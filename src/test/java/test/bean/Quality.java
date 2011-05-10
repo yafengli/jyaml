@@ -1,3 +1,5 @@
+package test.bean;
+
 public class Quality {
 	private String loyal;
 	private String friendly;

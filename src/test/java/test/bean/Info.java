@@ -1,3 +1,5 @@
+package test.bean;
+
 import java.util.HashSet;
 
 
