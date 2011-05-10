@@ -120,7 +120,7 @@ public class YamlConfig implements YamlOperations, Cloneable {
 	 * sets the charset (or encoding) to use for both encoding and decoding. See
 	 * http://java.sun.com/j2se/1.4.2/docs/api/java/nio/charset/Charset.html
 	 *
-	 * @param encoding
+	 * @param charset
 	 */
 	public void setEncoding(String charset) {
 		this.encoding = charset;
@@ -256,25 +256,7 @@ public class YamlConfig implements YamlOperations, Cloneable {
 	}
 
 	public ObjectWrapper getWrapper(Class clazz) {
-
 		ObjectWrapper ret;
-		try {
-			if (clazz == null) {
-				System.out.println("@1 NULL@");
-			} else if (clazz.getClassLoader() == null) {
-				System.out.println("@2 NULL@");
-
-			} else if (clazz.getClassLoader().loadClass(
-					clazz.getCanonicalName()) == null) {
-				System.out.println("@2 NULL@:" + clazz.getCanonicalName() + "," + clazz.getName());
-			} else {
-				System.out.printf("@YamlConfig.getWrapper.class@:%s|%s|%s\n", clazz
-						.getClassLoader(), clazz.getClassLoader().loadClass(clazz.getName())
-						.newInstance(), clazz.newInstance());
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 		String classname = clazz.getName();
 		if (handlers != null && handlers.containsKey(classname))
 			ret = initWrapper(classname, clazz);
@@ -316,28 +298,12 @@ public class YamlConfig implements YamlOperations, Cloneable {
 
 	public ObjectWrapper getWrapper(String classname) {
 		ObjectWrapper ret;
-		System.out.printf("@YamlConfig.getWrapper.name@:%s\n", classname);
 		Class type = ReflectionUtil.classForName(transfer2classname(classname));
 		if (type == null)
 			return null;
-		if (handlers != null && handlers.containsKey(classname))
-			ret = initWrapper(classname, type);
 		else {
-			if (Map.class.isAssignableFrom(type))
-				ret = new DefaultMapWrapper(type);
-			else if (Collection.class.isAssignableFrom(type))
-				ret = new DefaultCollectionWrapper(type);
-			else if (type.isArray())
-				ret = new ArrayWrapper(type);
-			else if (ReflectionUtil.isSimpleType(type))
-				return new DefaultSimpleTypeWrapper(type);
-			else if (type.isEnum())
-				ret = new EnumWrapper(type);
-			else
-				ret = new DefaultBeanWrapper(type);
+			return getWrapper(type);
 		}
-		ret.setYamlConfig(this);
-		return ret;
 	}
 
 	public ObjectWrapper getWrapperSetContent(String classname, String content) {

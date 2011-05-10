@@ -97,9 +97,7 @@ abstract class State {
 	}
 
 	ObjectWrapper createWrapper(String fallback) {
-		System.out.printf("@State.createWrapper.type@:%s\n", expectedType());
 		ObjectWrapper ret = decoder.getConfig().getWrapper(expectedType());
-		System.out.printf("@State.createWrapper.ret@:%s\n", ret);
 		if(getDeclaredClass()!=null){
 			ret=decoder.getConfig().getWrapper(getDeclaredClass());
 		}
