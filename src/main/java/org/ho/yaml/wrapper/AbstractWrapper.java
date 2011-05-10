@@ -47,7 +47,6 @@ public abstract class AbstractWrapper implements ObjectWrapper {
     }
 	
 	protected Object createObject(){
-		System.out.printf("@AbstractWrapper.createObject@:\n");
 	    try{
 	        if (config.isConstructorAccessibleForDecoding(type)){
 	            Constructor constr = type.getDeclaredConstructor(null);

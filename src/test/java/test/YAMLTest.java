@@ -2,6 +2,7 @@ package test;
 
 import org.ho.yaml.Yaml;
 import org.junit.Test;
+import test.bean.Entity;
 import test.bean.Info;
 
 import java.io.File;
@@ -50,21 +51,15 @@ public class YAMLTest {
 
 	@Test
 	public void testYaml() {
-		String yamlText =
-				"---\n" +
-						"date: 11/30/2005\n" +
-						"receipts:\n" +
-						"    -\n" +
-						"        store: la madeleine\n" +
-						"        category: \"dining out: lunch\"\n" +
-						"        total: 13.14\n" +
-						"---\n" +
-						"date: 12/1/2005\n" +
-						"receipts:\n" +
-						"    -\n" +
-						"        store: sushi me\n" +
-						"        category: \"dining out: lunch\"\n" +
-						"        total: 5.60";
-
+		File f = new File("src/test/resources/test.yml");
+		System.out.printf("$file absolute path:$%s\n", f.getAbsolutePath());
+		try {
+			Object obj = Yaml.load(f);
+			System.out.println(obj);
+			Entity entity = Yaml.loadType(f, Entity.class);
+			System.out.println(entity);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

@@ -22,6 +22,8 @@
  */
 package org.ho.util;
 
+import java.util.Map;
+
 public class Logger {
 
 	public enum Level {INFO, WARN, NONE};

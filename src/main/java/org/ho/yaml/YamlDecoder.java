@@ -22,25 +22,15 @@
  */
 package org.ho.yaml;
 
-import java.io.BufferedReader;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
-import java.util.NoSuchElementException;
-
 import org.ho.util.Logger;
 import org.ho.yaml.exception.YamlException;
-
 import yaml.parser.SyntaxException;
 import yaml.parser.YamlParser;
 import yaml.parser.YamlParserEvent;
+
+import java.io.*;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * YamlDecoder - The usage of YamlDecoder mirrors that of java.beans.XMLDecoder.
@@ -48,7 +38,6 @@ import yaml.parser.YamlParserEvent;
  * decoder. In most cases you may find it is not necessary to access this class
  * directly as {@link Yaml} contain methods for the most common usages. The
  * utility functions that were previously in this class are now in {@link Yaml}.
- * 
  */
 public class YamlDecoder {
 
@@ -58,11 +47,9 @@ public class YamlDecoder {
 
 	/**
 	 * This constructor is for bootstrapping in YamlConfig.
-	 * 
-	 * @param in
-	 *            the InputStream to read from.
-	 * @param config
-	 *            the YAML config
+	 *
+	 * @param in     the InputStream to read from.
+	 * @param config the YAML config
 	 * @throws FileNotFoundException
 	 */
 	YamlDecoder(InputStream in, YamlConfig config) {
@@ -77,9 +64,8 @@ public class YamlDecoder {
 
 	/**
 	 * Creates a YamlDecoder that reads from specified stream.
-	 * 
-	 * @param in
-	 *            InputStream to read from.
+	 *
+	 * @param in InputStream to read from.
 	 */
 	public YamlDecoder(InputStream in) {
 		try {
@@ -92,9 +78,8 @@ public class YamlDecoder {
 
 	/**
 	 * Creates a YamlDecoder that reads from specifed reader.
-	 * 
-	 * @param reader
-	 *            Reader to read from
+	 *
+	 * @param reader Reader to read from
 	 */
 	public YamlDecoder(Reader reader) {
 		this.in = new BufferedReader(reader);
@@ -102,11 +87,9 @@ public class YamlDecoder {
 
 	/**
 	 * Creates a YamlDecoder that reads from specifed reader and YAML config.
-	 * 
-	 * @param reader
-	 *            reader to read from
-	 * @param config
-	 *            YAML config
+	 *
+	 * @param reader reader to read from
+	 * @param config YAML config
 	 */
 	public YamlDecoder(Reader reader, YamlConfig config) {
 		this(reader);
@@ -115,10 +98,9 @@ public class YamlDecoder {
 
 	/**
 	 * Reads one object from the Yaml stream.
-	 * 
+	 *
 	 * @return the next object in the Yaml stream.
-	 * @throws EOFException
-	 *             - if the end of the Yaml stream has been reached.
+	 * @throws EOFException - if the end of the Yaml stream has been reached.
 	 */
 	public Object readObject() throws EOFException {
 		try {
@@ -135,7 +117,6 @@ public class YamlDecoder {
 
 			if (ret == null)
 				throw new YamlException("Document is empty.");
-			System.out.printf("@readObject:{%s}@\n", ret.getClass().getName());
 			return ret;
 		} catch (EOFException e) {
 			throw e;
@@ -189,11 +170,9 @@ public class YamlDecoder {
 
 	/**
 	 * Returns the next object from the Yaml stream given the expected type.
-	 * 
-	 * @param <T>
-	 *            The type of the object expected.
-	 * @param clazz
-	 *            the class representing the type of the object expected.
+	 *
+	 * @param <T>   The type of the object expected.
+	 * @param clazz the class representing the type of the object expected.
 	 * @return next object from the Yaml stream given the expected type.
 	 */
 	public <T> T readObjectOfType(Class<T> clazz) throws EOFException {
@@ -211,7 +190,6 @@ public class YamlDecoder {
 			T ret = (T) event.getBean();
 			if (ret == null)
 				throw new YamlException("Document is empty.");
-			System.out.printf("@readObjectOfType@:{%s}\n", ret.getClass().getName());
 			return ret;
 		} catch (EOFException e) {
 			throw e;
@@ -220,7 +198,6 @@ public class YamlDecoder {
 
 	/**
 	 * Closes this decoder instance.
-	 * 
 	 */
 	public void close() {
 		try {
@@ -237,11 +214,6 @@ public class YamlDecoder {
 			this.clazz = clazz;
 			peek();
 		}
-
-		/**
-		 * @param decoder
-		 * @param clazz
-		 */
 		private void peek() {
 			try {
 				if (clazz == Object.class)
@@ -297,7 +269,7 @@ public class YamlDecoder {
 
 	/**
 	 * returns whether the suppress warnings option is on
-	 * 
+	 *
 	 * @return whether the suppress warnings option is on
 	 */
 	public boolean isSuppressWarnings() {
@@ -306,9 +278,8 @@ public class YamlDecoder {
 
 	/**
 	 * sets the suppress warnings option
-	 * 
-	 * @param suppressWarnings
-	 *            true for on; false for off.
+	 *
+	 * @param suppressWarnings true for on; false for off.
 	 */
 	public void setSuppressWarnings(boolean suppressWarnings) {
 		config.setSuppressWarnings(suppressWarnings);
@@ -316,7 +287,7 @@ public class YamlDecoder {
 
 	/**
 	 * returns the Jyaml configuration for this Decoder
-	 * 
+	 *
 	 * @return a YamlConfig
 	 */
 	public YamlConfig getConfig() {
@@ -325,9 +296,8 @@ public class YamlDecoder {
 
 	/**
 	 * set the Jyaml configuration for this decoder
-	 * 
-	 * @param config
-	 *            the config object to set
+	 *
+	 * @param config the config object to set
 	 */
 	public void setConfig(YamlConfig config) {
 		this.config = config;
