@@ -11,4 +11,20 @@ import java.util.HashSet;
 public class Entity {
 	private Date date;
 	private HashSet<Receipty> receipts;
+
+	public Date getDate() {
+		return date;
+	}
+
+	public void setDate(Date date) {
+		this.date = date;
+	}
+
+	public HashSet<Receipty> getReceipts() {
+		return receipts;
+	}
+
+	public void setReceipts(HashSet<Receipty> receipts) {
+		this.receipts = receipts;
+	}
 }

@@ -25,1250 +25,1238 @@
  * 
  */
 package yaml.parser;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
-import java.util.HashMap;
 
 import org.ho.yaml.Utilities;
-import org.ho.yaml.tests.TestYamlParserEvent;
+
+import java.io.*;
+import java.util.HashMap;
 
 
-/** An experimental Yaml parser.
-
-        <ul>
-        <li>No compiler-compiler: hand-written code.
-        <li>All functions return boolean if the item exists, false if not. If false, they don't modify anything.
-        <li>Relevant functions send an event thru the ParserEvent object.
-        <li>properties are inespecific (analyze at the next higher level): no branch and leaf properties.
-        <li>Uses a special ParserReader, not a java.io.PushBackReader.
-        </ul>
-
-    @autor: Rolf Veen
-    @date: March 2002
-    @license: Open-source compatible TBD (Apache or zlib or Public Domain)
+/**
+ * An experimental Yaml parser.
+ * <p/>
+ * <ul>
+ * <li>No compiler-compiler: hand-written code.
+ * <li>All functions return boolean if the item exists, false if not. If false, they don't modify anything.
+ * <li>Relevant functions send an event thru the ParserEvent object.
+ * <li>properties are inespecific (analyze at the next higher level): no branch and leaf properties.
+ * <li>Uses a special ParserReader, not a java.io.PushBackReader.
+ * </ul>
+ *
+ * @autor: Rolf Veen
+ * @date: March 2002
+ * @license: Open-source compatible TBD (Apache or zlib or Public Domain)
  */
 
-public final class YamlParser
-{
-    /* Definition of the YAML events */
+public final class YamlParser {
+	/* Definition of the YAML events */
 
-    public final static int LIST_OPEN = '[';
-    public final static int LIST_CLOSE = ']';
-    public final static int MAP_OPEN = '{';
-    public final static int MAP_CLOSE = '}';
-    public final static int LIST_NO_OPEN = 'n';
-    public final static int MAP_NO_OPEN = 'N';
-    public final static int DOCUMENT_HEADER = 'H';
-    public final static int MAP_SEPARATOR = ':';
-    public final static int LIST_ENTRY = '-';    
+	public final static int LIST_OPEN = '[';
+	public final static int LIST_CLOSE = ']';
+	public final static int MAP_OPEN = '{';
+	public final static int MAP_CLOSE = '}';
+	public final static int LIST_NO_OPEN = 'n';
+	public final static int MAP_NO_OPEN = 'N';
+	public final static int DOCUMENT_HEADER = 'H';
+	public final static int MAP_SEPARATOR = ':';
+	public final static int LIST_ENTRY = '-';
 
-    protected ParserReader r;
-    protected int line=1;
+	protected ParserReader r;
+	protected int line = 1;
 
-    private ParserEvent event;
-    private HashMap props;
-    private char pendingEvent;
+	private ParserEvent event;
+	private HashMap props;
+	private char pendingEvent;
 
-    public YamlParser (Reader r, ParserEvent event)
-    {
-        this.r = new ParserReader(r);
-        this.event = event;
-        props = new HashMap();
-    }
+	public YamlParser(Reader r, ParserEvent event) {
+		this.r = new ParserReader(r);
+		this.event = event;
+		props = new HashMap();
+	}
 
-    protected String readerString()
-    {
-        return r.string();
-    }
+	protected String readerString() {
+		return r.string();
+	}
 
-    private void clearEvents()
-    {
-        props.clear();
-    }
+	private void clearEvents() {
+		props.clear();
+	}
 
-    private void sendEvents()
-    {
-        String s;
+	private void sendEvents() {
+		String s;
 
-        if (pendingEvent == '[')
-            event.event(LIST_OPEN);
-            
-        if (pendingEvent == '{')
-            event.event(MAP_OPEN);
-        
-        pendingEvent = 0;
+		if (pendingEvent == '[')
+			event.event(LIST_OPEN);
 
-        if ((s=(String)props.get("anchor")) != null)
-            event.property("anchor",s);
+		if (pendingEvent == '{')
+			event.event(MAP_OPEN);
 
-        if ((s=(String)props.get("transfer")) != null)
-            event.property("transfer",s);
+		pendingEvent = 0;
 
-        if ((s=(String)props.get("alias")) != null)
-            event.content("alias",s);
+		if ((s = (String) props.get("anchor")) != null)
+			event.property("anchor", s);
 
-        if (props.keySet().contains("string"))
-            event.content("string",(String)props.get("string"));
+		if ((s = (String) props.get("transfer")) != null)
+			event.property("transfer", s);
 
-        if (props.keySet().contains("value"))
-            event.content("value",(String)props.get("value"));
-        
-        props.clear();
-    }
+		if ((s = (String) props.get("alias")) != null)
+			event.content("alias", s);
 
-    /** how many spaces from index till first non space */
+		if (props.keySet().contains("string"))
+			event.content("string", (String) props.get("string"));
 
-    public int indent() throws IOException, SyntaxException
-    {
-        mark();
+		if (props.keySet().contains("value"))
+			event.content("value", (String) props.get("value"));
 
-        int i = 0;
-        int ch;
-        while ( YamlCharacter.is(ch = r.read(), YamlCharacter.INDENT ) )
-            i++;
-        if (ch == '\t')
-            throw new SyntaxException("Tabs may not be used for indentation.", line);
-        reset();
-        return i;
-    }
+		props.clear();
+	}
 
-    /** string of characters of type 'type' */
+	/**
+	 * how many spaces from index till first non space
+	 */
 
-    public boolean array(int type) throws IOException
-    {
-        mark();
+	public int indent() throws IOException, SyntaxException {
+		mark();
 
-        int i = 0;
+		int i = 0;
+		int ch;
+		while (YamlCharacter.is(ch = r.read(), YamlCharacter.INDENT))
+			i++;
+		if (ch == '\t')
+			throw new SyntaxException("Tabs may not be used for indentation.", line);
+		reset();
+		return i;
+	}
 
-        while ( YamlCharacter.is( r.read(), type )  )
-            i++;
+	/**
+	 * string of characters of type 'type'
+	 */
 
-        if (i != 0) {
-            r.unread();
-            unmark();
-            return true;
-        }
+	public boolean array(int type) throws IOException {
+		mark();
 
-        reset();
-        return false;
-    }
+		int i = 0;
 
-    /** space = char_space+ */
+		while (YamlCharacter.is(r.read(), type))
+			i++;
 
-    public boolean space() throws IOException
-    {
-        return array(YamlCharacter.SPACE);
-    }
+		if (i != 0) {
+			r.unread();
+			unmark();
+			return true;
+		}
 
-    /** line = char_line+
+		reset();
+		return false;
+	}
 
-        <p>Spaces not included !</p>
-    */
+	/**
+	 * space = char_space+
+	 */
 
-    public boolean line() throws IOException
-    {
-        return array(YamlCharacter.LINE);
-    }
+	public boolean space() throws IOException {
+		return array(YamlCharacter.SPACE);
+	}
 
-    /** linesp = char_linesp+
+	/**
+	 * line = char_line+
+	 * <p/>
+	 * <p>Spaces not included !</p>
+	 */
 
-        <p>Spaces included !</p>
-    */
+	public boolean line() throws IOException {
+		return array(YamlCharacter.LINE);
+	}
 
-    public boolean linesp() throws IOException
-    {
-        return array(YamlCharacter.LINESP);
-    }
+	/**
+	 * linesp = char_linesp+
+	 * <p/>
+	 * <p>Spaces included !</p>
+	 */
 
-    /** word = char_word+  */
+	public boolean linesp() throws IOException {
+		return array(YamlCharacter.LINESP);
+	}
 
-    public boolean word() throws IOException
-    {
-        return array(YamlCharacter.WORD);
-    }
+	/**
+	 * word = char_word+
+	 */
 
-    /** number = char_digit+  */
+	public boolean word() throws IOException {
+		return array(YamlCharacter.WORD);
+	}
 
-    public boolean number() throws IOException
-    {
-        return array(YamlCharacter.DIGIT);
-    }
+	/**
+	 * number = char_digit+
+	 */
 
-    /** indent(n) ::= n*SP */
+	public boolean number() throws IOException {
+		return array(YamlCharacter.DIGIT);
+	}
 
-    public boolean indent(int n) throws IOException
-    {
-        mark();
+	/**
+	 * indent(n) ::= n*SP
+	 */
 
-        while ( YamlCharacter.is(r.read(), YamlCharacter.INDENT) && n > 0 ) 
-            n--;
+	public boolean indent(int n) throws IOException {
+		mark();
 
-        if (n == 0) {
-            r.unread();
-            unmark();
-            return true;
-        }
+		while (YamlCharacter.is(r.read(), YamlCharacter.INDENT) && n > 0)
+			n--;
 
-        reset();
-        return false;
-    }
+		if (n == 0) {
+			r.unread();
+			unmark();
+			return true;
+		}
 
-    /** newline ::= ( CR LF) | CR | LF / NEL / PS / LS  (| EOF)  */
+		reset();
+		return false;
+	}
 
-    public boolean newline() throws IOException
-    {
-        line++;
-        mark();
+	/**
+	 * newline ::= ( CR LF) | CR | LF / NEL / PS / LS  (| EOF)
+	 */
 
-        int c = r.read();
-        int c2 = r.read();
+	public boolean newline() throws IOException {
+		line++;
+		mark();
 
-        if ( c == -1 || (c == 13 && c2 == 10) ) {
-            unmark();
-            return true;
-        }
+		int c = r.read();
+		int c2 = r.read();
 
-        if ( YamlCharacter.is(c, YamlCharacter.LINEBREAK) ) {
-            r.unread();
-            unmark();
-            return true;
-        }
+		if (c == -1 || (c == 13 && c2 == 10)) {
+			unmark();
+			return true;
+		}
 
-        reset();
-        line--;
-        return false;
-    }
-    
-    /* end ::= space? newline icomment(-1)* */
-    
-    public boolean end() throws IOException, SyntaxException
-    {
-        mark();
-        
-        space();
-        
-        if (! newline() ) {
-            reset();
-            return false;
-        }
-        
-        while (comment(-1,false));
-        
-        unmark();
-        return true;
-    }
+		if (YamlCharacter.is(c, YamlCharacter.LINEBREAK)) {
+			r.unread();
+			unmark();
+			return true;
+		}
 
-    /** simple string
+		reset();
+		line--;
+		return false;
+	}
 
-        <p>This function reads also trailing spaces. Trim later</p>
-     */
+	/* end ::= space? newline icomment(-1)* */
 
-    public boolean string_simple() throws IOException
-    {
-        char ch;
-        int c;
+	public boolean end() throws IOException, SyntaxException {
+		mark();
 
-        int i = 0;
-        r.mark();
-        boolean dash_first = false;
-        while ( true ) {
-            c = r.read();
-            if (c == -1) break;
+		space();
 
-            ch = (char) c;
-            if (i == 0 && '-' == ch){
-            	dash_first = true;
-            	continue;
-            }
-            if (i == 0 && (YamlCharacter.isSpaceChar(ch) || YamlCharacter.isIndicatorNonSpace(ch) || YamlCharacter.isIndicatorSpace(ch) ) )
-                break;
-            if (dash_first && (YamlCharacter.isSpaceChar(ch) || YamlCharacter.isLineBreakChar(ch))){
-            	unmark();
-            	return false;
-            }
-            if ( ! YamlCharacter.isLineSpChar(ch) ||
-                 (YamlCharacter.isIndicatorSimple(ch) && r.previous() != '\\' ) )
-                break;
-            i++;
-        }
+		if (!newline()) {
+			reset();
+			return false;
+		}
 
-        r.unread();
-        r.unmark();
-        if (i != 0)
-            return true;
+		while (comment(-1, false)) ;
 
-        return false;
-    }
+		unmark();
+		return true;
+	}
 
-    public boolean loose_string_simple() throws IOException
-    {
-        char ch = 0;
-        int c;
+	/**
+	 * simple string
+	 * <p/>
+	 * <p>This function reads also trailing spaces. Trim later</p>
+	 */
 
-        int i = 0;
+	public boolean string_simple() throws IOException {
+		char ch;
+		int c;
 
-        while ( true ) {
-            c = r.read();
-            if (c == -1) break;
+		int i = 0;
+		r.mark();
+		boolean dash_first = false;
+		while (true) {
+			c = r.read();
+			if (c == -1) break;
 
-            ch = (char) c;
+			ch = (char) c;
+			if (i == 0 && '-' == ch) {
+				dash_first = true;
+				continue;
+			}
+			if (i == 0 && (YamlCharacter.isSpaceChar(ch) || YamlCharacter.isIndicatorNonSpace(ch) || YamlCharacter.isIndicatorSpace(ch)))
+				break;
+			if (dash_first && (YamlCharacter.isSpaceChar(ch) || YamlCharacter.isLineBreakChar(ch))) {
+				unmark();
+				return false;
+			}
+			if (!YamlCharacter.isLineSpChar(ch) ||
+					(YamlCharacter.isIndicatorSimple(ch) && r.previous() != '\\'))
+				break;
+			i++;
+		}
+
+		r.unread();
+		r.unmark();
+		if (i != 0)
+			return true;
+
+		return false;
+	}
+
+	public boolean loose_string_simple() throws IOException {
+		char ch = 0;
+		int c;
+
+		int i = 0;
+
+		while (true) {
+			c = r.read();
+			if (c == -1) break;
+
+			ch = (char) c;
 //            if (i == 0 && (YamlCharacter.isSpaceChar(ch) || YamlCharacter.isIndicatorNonSpace(ch) || YamlCharacter.isIndicatorSpace(ch) ) )
 //                break;
 
-            if ( ! YamlCharacter.isLineSpChar(ch) ||
-                 (YamlCharacter.isLooseIndicatorSimple(ch) && r.previous() != '\\' ) )
-                break;
-            i++;
-        }
+			if (!YamlCharacter.isLineSpChar(ch) ||
+					(YamlCharacter.isLooseIndicatorSimple(ch) && r.previous() != '\\'))
+				break;
+			i++;
+		}
 
-        r.unread();
-        if (i == 0){
-            if (YamlCharacter.isLineBreakChar(ch))
-                return true;
-            else
-                return false;
-        }
-        return true;
-    }
-    
-    /** single quoted string (ends with ''' not preceded by esc) */
+		r.unread();
+		if (i == 0) {
+			if (YamlCharacter.isLineBreakChar(ch))
+				return true;
+			else
+				return false;
+		}
+		return true;
+	}
 
-    boolean string_q1() throws IOException, SyntaxException
-    {
-        if ( r.current() != '\'')
-            return false;
+	/**
+	 * single quoted string (ends with ''' not preceded by esc)
+	 */
 
-        r.read();
-        int c=0;
-        int i = 0;
+	boolean string_q1() throws IOException, SyntaxException {
+		if (r.current() != '\'')
+			return false;
 
-        while ( YamlCharacter.is( c=r.read(), YamlCharacter.LINESP ) ) {
-            if (c == '\''  && r.previous() != '\\' )
-                break;
-            i++;
-        }
+		r.read();
+		int c = 0;
+		int i = 0;
 
-        if ( c != '\'' )
-            throw new SyntaxException("Unterminated string",line);
+		while (YamlCharacter.is(c = r.read(), YamlCharacter.LINESP)) {
+			if (c == '\'' && r.previous() != '\\')
+				break;
+			i++;
+		}
 
-//        if (i != 0)
-            return true;
-
-//        return false;
-    }
-
-    /** double quoted string (ends with '"' not preceded by esc) */
-
-    boolean string_q2() throws IOException, SyntaxException
-    {
-
-        if ( r.current() != '"')
-            return false;
-
-        r.read();
-        int c=0;
-        int i = 0;
-
-        while (YamlCharacter.is( c=r.read(), YamlCharacter.LINESP ) ) {
-            if ( c == '"'  && r.previous() != '\\' )
-                break;
-            i++;
-        }
-
-        if ( c != '"' )
-            throw new SyntaxException("Unterminated string",line);
+		if (c != '\'')
+			throw new SyntaxException("Unterminated string", line);
 
 //        if (i != 0)
-            return true;
+		return true;
 
 //        return false;
-    }
+	}
 
-    /** string ::= single_quoted | double_quoted | simple
+	/**
+	 * double quoted string (ends with '"' not preceded by esc)
+	 */
 
-        <p>All strings are trimmed</p>
-    */
-    public boolean loose_string() throws IOException, SyntaxException
-    {
-        mark();
-        boolean q2 = false;
-        boolean q1 = false;
-        if ( (q1 = string_q1()) || (q2 = string_q2()) || loose_string_simple() ) {
-            String str = r.string().trim();
-            if (q2)
-                str = fix_q2(str);
-            else if (q1)
-            	str = fix_q1(str);
-            if (q1 || q2)
-                props.put("string",  str);
-            else
-                if ("".equals(str))
-                    props.put("value", null);
-                else
-                    props.put("value", str);
-            unmark();
-            return true;
-        }
+	boolean string_q2() throws IOException, SyntaxException {
 
-        reset();
-        return false;
-    }
+		if (r.current() != '"')
+			return false;
 
-    public boolean string() throws IOException, SyntaxException
-    {
-        mark();
-        boolean q2 = false;
-        boolean q1 = false;
-        if ( (q1 = string_q1()) || (q2 = string_q2()) || string_simple() ) {
-            String str = r.string().trim();
-            if (q2)
-                str = fix_q2(str);
-            else if (q1)
-            	str = fix_q1(str);
-            if (q1 || q2)
-                props.put("string",  str);
-            else
-                props.put("value", str);
-            unmark();
-            return true;
-        }
+		r.read();
+		int c = 0;
+		int i = 0;
 
-        reset();
-        return false;
-    }
+		while (YamlCharacter.is(c = r.read(), YamlCharacter.LINESP)) {
+			if (c == '"' && r.previous() != '\\')
+				break;
+			i++;
+		}
 
-    String fix_q2(String str){
-    	if (str.length() > 2)
-    		return Utilities.unescape(str.substring(1, str.length() - 1));
-    	else
-    		return "";
-    }
-    
-    String fix_q1(String str){
-    	if (str.length() > 2)
-    		return str.substring(1, str.length() - 1);
-    	else
-    		return "";
-    }
-    
-    /** alias ::= '*' word */
+		if (c != '"')
+			throw new SyntaxException("Unterminated string", line);
 
-    public boolean alias() throws IOException
-    {
-        mark();
+//        if (i != 0)
+		return true;
 
-        if ( r.read() != '*' ) {
-            r.unread();
-            unmark();
-            return false;
-        }
+//        return false;
+	}
 
-        if (! word() ) {
-            reset();
-            return false;
-        }
+	/**
+	 * string ::= single_quoted | double_quoted | simple
+	 * <p/>
+	 * <p>All strings are trimmed</p>
+	 */
+	public boolean loose_string() throws IOException, SyntaxException {
+		mark();
+		boolean q2 = false;
+		boolean q1 = false;
+		if ((q1 = string_q1()) || (q2 = string_q2()) || loose_string_simple()) {
+			String str = r.string().trim();
+			if (q2)
+				str = fix_q2(str);
+			else if (q1)
+				str = fix_q1(str);
+			if (q1 || q2)
+				props.put("string", str);
+			else if ("".equals(str))
+				props.put("value", null);
+			else
+				props.put("value", str);
+			unmark();
+			return true;
+		}
 
-        unmark();
-        props.put("alias", r.string() );
-        return true;
-    }
+		reset();
+		return false;
+	}
 
-    /** anchor ::= '&' word */
+	public boolean string() throws IOException, SyntaxException {
+		mark();
+		boolean q2 = false;
+		boolean q1 = false;
+		if ((q1 = string_q1()) || (q2 = string_q2()) || string_simple()) {
+			String str = r.string().trim();
+			if (q2)
+				str = fix_q2(str);
+			else if (q1)
+				str = fix_q1(str);
+			if (q1 || q2)
+				props.put("string", str);
+			else
+				props.put("value", str);
+			unmark();
+			return true;
+		}
 
-    public boolean anchor() throws IOException
-    {
-        mark();
+		reset();
+		return false;
+	}
 
-        if ( r.read() != '&' ) {
-            r.unread();
-            unmark();
-            return false;
-        }
+	String fix_q2(String str) {
+		if (str.length() > 2)
+			return Utilities.unescape(str.substring(1, str.length() - 1));
+		else
+			return "";
+	}
 
-        if (! word() ) {
-            reset();
-            return false;
-        }
+	String fix_q1(String str) {
+		if (str.length() > 2)
+			return str.substring(1, str.length() - 1);
+		else
+			return "";
+	}
 
-        unmark();
-        props.put("anchor", r.string() );
-        return true;
-    }
+	/**
+	 * alias ::= '*' word
+	 */
 
-    /** throwable comment productions.
+	public boolean alias() throws IOException {
+		mark();
 
-        icomment(n) ::= indent(&lt;n) ('#' linesp )? newline<br>
-        xcomment(n) ::= indent(&lt;n) '#' linesp newline<br><br>
+		if (r.read() != '*') {
+			r.unread();
+			unmark();
+			return false;
+		}
 
-        icomment(n) ::= comment(n,false)<br>
-        xcomment(n) ::= comment(n,true)
-     */
+		if (!word()) {
+			reset();
+			return false;
+		}
 
-    public boolean comment(int n, boolean explicit) throws IOException, SyntaxException
-    {
-        mark();
+		unmark();
+		props.put("alias", r.string());
+		return true;
+	}
 
-        if (n != -1 && indent() >= n) {
-            reset();
-            return false;
-        }
+	/**
+	 * anchor ::= '&' word
+	 */
 
-        space();
+	public boolean anchor() throws IOException {
+		mark();
 
-        int c;
-        if ((c=r.read()) == '#')
-            linesp();
-        else {
-            if (c == -1) {
-                unmark();
-                return false;
-            }
+		if (r.read() != '&') {
+			r.unread();
+			unmark();
+			return false;
+		}
 
-            if (explicit) {
-                reset();
-                return false;
-            }
-            else
-                r.unread();
-        }
+		if (!word()) {
+			reset();
+			return false;
+		}
 
-        boolean b = newline();
+		unmark();
+		props.put("anchor", r.string());
+		return true;
+	}
 
-        if (b == false)
-        {
-            reset();
-            return false;
-        }
+	/**
+	 * throwable comment productions.
+	 * <p/>
+	 * icomment(n) ::= indent(&lt;n) ('#' linesp )? newline<br>
+	 * xcomment(n) ::= indent(&lt;n) '#' linesp newline<br><br>
+	 * <p/>
+	 * icomment(n) ::= comment(n,false)<br>
+	 * xcomment(n) ::= comment(n,true)
+	 */
 
-        unmark();
-        return true;
-    }
+	public boolean comment(int n, boolean explicit) throws IOException, SyntaxException {
+		mark();
 
-    /** header ::= '---' (space directive)*  */
+		if (n != -1 && indent() >= n) {
+			reset();
+			return false;
+		}
 
-    public boolean header() throws IOException
-    {
-        mark();
+		space();
 
-        int c = r.read();
-        int c2 = r.read();
-        int c3 = r.read();
+		int c;
+		if ((c = r.read()) == '#')
+			linesp();
+		else {
+			if (c == -1) {
+				unmark();
+				return false;
+			}
 
-        if (c != '-' || c2 != '-' || c3 != '-')
-        {
-            reset();
-            return false;
-        }
+			if (explicit) {
+				reset();
+				return false;
+			} else
+				r.unread();
+		}
 
-        while ( space()  && directive() );
+		boolean b = newline();
 
-        unmark();
-        event.event(DOCUMENT_HEADER);
-        return true;
-    }
+		if (b == false) {
+			reset();
+			return false;
+		}
 
-    /** directive ::= '#' word ':' line  */
+		unmark();
+		return true;
+	}
 
-    public boolean directive() throws IOException
-    {
-        mark();
+	/**
+	 * header ::= '---' (space directive)*
+	 */
 
-        if ( r.read() != '#' ) {
-            r.unread();
-            unmark();
-            return false;
-        }
+	public boolean header() throws IOException {
+		mark();
 
-        if ( ! word() ) {
-            reset();
-            return false;
-        }
+		int c = r.read();
+		int c2 = r.read();
+		int c3 = r.read();
 
-        if ( r.read() != ':') {
-            reset();
-            return false;
-        }
+		if (c != '-' || c2 != '-' || c3 != '-') {
+			reset();
+			return false;
+		}
 
-        if (! line() ) {
-            reset();
-            return false;
-        }
+		while (space() && directive()) ;
 
-        event.content("directive", r.string() );
-        unmark();
-        return true;
-    }
+		unmark();
+		event.event(DOCUMENT_HEADER);
+		return true;
+	}
 
-    /** transfer ::= '!' line */
+	/**
+	 * directive ::= '#' word ':' line
+	 */
 
-    public boolean transfer() throws IOException
-    {
-        mark();
+	public boolean directive() throws IOException {
+		mark();
 
-        if ( r.read() != '!' ) {
-            r.unread();
-            unmark();
-            return false;
-        }
+		if (r.read() != '#') {
+			r.unread();
+			unmark();
+			return false;
+		}
 
-        if (! line() ) {
-            reset();
-            return false;
-        }
-        props.put("transfer", r.string() );
-        unmark();
-        
-        return true;
-    }
+		if (!word()) {
+			reset();
+			return false;
+		}
 
-    /** properties ::= ( transfer ( space anchor )? ) | ( anchor ( space transfer )? */
+		if (r.read() != ':') {
+			reset();
+			return false;
+		}
 
-    public boolean properties() throws IOException
-    {
-        mark();
+		if (!line()) {
+			reset();
+			return false;
+		}
 
-        if (transfer())
-        {
-            space();
-            anchor();
-            unmark();
-            return true;
-        }
+		event.content("directive", r.string());
+		unmark();
+		return true;
+	}
 
-        if (anchor())
-        {
-            space();
-            transfer();
-            unmark();
-            return true;
-        }
+	/**
+	 * transfer ::= '!' line
+	 */
 
-        reset();
-        return false;
-    }
+	public boolean transfer() throws IOException {
+		mark();
 
-    /** key ::= ( '?' value_nested(&gt;n) indent(n) ) | ( value_inline space? ) */
+		if (r.read() != '!') {
+			r.unread();
+			unmark();
+			return false;
+		}
 
-    public boolean key(int n) throws IOException, SyntaxException
-    {
-        if (r.current() == '?') {
-            r.read();
-            if (! value_nested(n+1) ) throw new SyntaxException("'?' key indicator without a nested value",line);
-            if (! indent(n)) throw new SyntaxException("Incorrect indentations after nested key",line);
-            return true;
-        }
+		if (!line()) {
+			reset();
+			return false;
+		}
+		props.put("transfer", r.string());
+		unmark();
 
-        if (!value_inline())
-            return false;
+		return true;
+	}
 
-        space();
-        return true;
-    }
+	/**
+	 * properties ::= ( transfer ( space anchor )? ) | ( anchor ( space transfer )?
+	 */
 
-    /* value ::= (value_inline end) | value_block(n) | value_nested(n) */
+	public boolean properties() throws IOException {
+		mark();
 
-    public boolean value(int n) throws IOException, SyntaxException
-    {
+		if (transfer()) {
+			space();
+			anchor();
+			unmark();
+			return true;
+		}
+
+		if (anchor()) {
+			space();
+			transfer();
+			unmark();
+			return true;
+		}
+
+		reset();
+		return false;
+	}
+
+	/**
+	 * key ::= ( '?' value_nested(&gt;n) indent(n) ) | ( value_inline space? )
+	 */
+
+	public boolean key(int n) throws IOException, SyntaxException {
+		if (r.current() == '?') {
+			r.read();
+			if (!value_nested(n + 1)) throw new SyntaxException("'?' key indicator without a nested value", line);
+			if (!indent(n)) throw new SyntaxException("Incorrect indentations after nested key", line);
+			return true;
+		}
+
+		if (!value_inline())
+			return false;
+
+		space();
+		return true;
+	}
+
+	/* value ::= (value_inline end) | value_block(n) | value_nested(n) */
+
+	public boolean value(int n) throws IOException, SyntaxException {
 
 // System.out.println("value(n)");
 
-        if (value_nested(n) || value_block(n))
-            return true;
+		if (value_nested(n) || value_block(n))
+			return true;
 
-        if (!loose_value_inline()) return false;
+		if (!loose_value_inline()) return false;
 // System.out.println("value(n) is inline");
-        if (! end() )
-            throw new SyntaxException("Unterminated inline value",line);
-        return true;
-    }
-    
-    public boolean loose_value(int n) throws IOException, SyntaxException
-    {
+		if (!end())
+			throw new SyntaxException("Unterminated inline value", line);
+		return true;
+	}
+
+	public boolean loose_value(int n) throws IOException, SyntaxException {
 
 // System.out.println("value(n)");
 
-        if (value_nested(n) || value_block(n))
-            return true;
+		if (value_nested(n) || value_block(n))
+			return true;
 
-        if (!loose_value_inline()) return false;
+		if (!loose_value_inline()) return false;
 // System.out.println("value(n) is inline");
-        if (! end() )
-            throw new SyntaxException("Unterminated inline value",line);
-        return true;
-    }
+		if (!end())
+			throw new SyntaxException("Unterminated inline value", line);
+		return true;
+	}
 
-    public boolean value_na(int n) throws IOException, SyntaxException
-    {
-        if (value_nested(n) || value_block(n))
-            return true;
+	public boolean value_na(int n) throws IOException, SyntaxException {
+		if (value_nested(n) || value_block(n))
+			return true;
 
-        if (!value_inline_na()) return false;
+		if (!value_inline_na()) return false;
 
-        if (! end() )
-            throw new SyntaxException("Unterminated inline value",line);
+		if (!end())
+			throw new SyntaxException("Unterminated inline value", line);
 
-        return true;
-    }
+		return true;
+	}
 
-    public boolean value_inline() throws IOException, SyntaxException
-    {
-        mark();
+	public boolean value_inline() throws IOException, SyntaxException {
+		mark();
 
-        if (properties())
-            space();
+		if (properties())
+			space();
 
-        if (alias() || string()) {
-            sendEvents();
-            unmark();
-            return true;
-        }
+		if (alias() || string()) {
+			sendEvents();
+			unmark();
+			return true;
+		}
 
-        if (list() || map()) {
-            unmark();
-            return true;
-        }
+		if (list() || map()) {
+			unmark();
+			return true;
+		}
 
-        clearEvents();
-        reset();
-        return false;
-    }
+		clearEvents();
+		reset();
+		return false;
+	}
 
-    public boolean loose_value_inline() throws IOException, SyntaxException
-    {
-        mark();
+	public boolean loose_value_inline() throws IOException, SyntaxException {
+		mark();
 
-        if (properties())
-            space();
+		if (properties())
+			space();
 
-        if (alias() || loose_string()) {
-            sendEvents();
-            unmark();
-            return true;
-        }
+		if (alias() || loose_string()) {
+			sendEvents();
+			unmark();
+			return true;
+		}
 
-        if (list() || map()) {
-            unmark();
-            return true;
-        }
+		if (list() || map()) {
+			unmark();
+			return true;
+		}
 
-        clearEvents();
-        reset();
-        return false;
-    }
-    
-    public boolean value_inline_na() throws IOException, SyntaxException
-    {
-        mark();
+		clearEvents();
+		reset();
+		return false;
+	}
 
-        if (properties())
-            space();
+	public boolean value_inline_na() throws IOException, SyntaxException {
+		mark();
 
-        if (string()) {
-            sendEvents();
-            unmark();
-            return true;
-        }
+		if (properties())
+			space();
 
-        if (list() || map()) {
-            unmark();
-            return true;
-        }
+		if (string()) {
+			sendEvents();
+			unmark();
+			return true;
+		}
 
-        clearEvents();
-        reset();
-        return false;
-    }
+		if (list() || map()) {
+			unmark();
+			return true;
+		}
 
-    public boolean value_nested(int n) throws IOException, SyntaxException
-    {
-        mark();
+		clearEvents();
+		reset();
+		return false;
+	}
+
+	public boolean value_nested(int n) throws IOException, SyntaxException {
+		mark();
 // System.out.println("----------------------- 0");
-        if (properties())
-            space();
+		if (properties())
+			space();
 // System.out.println("----------------------- 1");
-        if (!end()) {
-            clearEvents();
-            reset();
-            return false;
-        }
+		if (!end()) {
+			clearEvents();
+			reset();
+			return false;
+		}
 // System.out.println("----------------------- 2");
-        sendEvents();
+		sendEvents();
 
-        while (comment(n,false));
+		while (comment(n, false)) ;
 // System.out.println("----------------------- 3");
-        if (nlist(n) || nmap(n)) {
-            unmark();
-            return true;
-        }
+		if (nlist(n) || nmap(n)) {
+			unmark();
+			return true;
+		}
 
-        reset();
-        return false;
-    }
+		reset();
+		return false;
+	}
 
-    public boolean value_block(int n) throws IOException, SyntaxException
-    {
-        mark();
+	public boolean value_block(int n) throws IOException, SyntaxException {
+		mark();
 
-        if (properties())
-            space();
+		if (properties())
+			space();
 
-        if (!block(n)) {
-            clearEvents();
-            reset();
-            return false;
-        }
+		if (!block(n)) {
+			clearEvents();
+			reset();
+			return false;
+		}
 
-        sendEvents();
+		sendEvents();
 
-        while (comment(n,false));
+		while (comment(n, false)) ;
 
-        unmark();
-        return true;
-    }
+		unmark();
+		return true;
+	}
 
-    /** nmap(n) ::= (indent(n) nmap_entry(n))+  */
+	/**
+	 * nmap(n) ::= (indent(n) nmap_entry(n))+
+	 */
 
-    public boolean nmap(int n) throws IOException, SyntaxException
-    {
-        mark();
+	public boolean nmap(int n) throws IOException, SyntaxException {
+		mark();
 // System.out.println("----------------------- 10");
-        int in = indent();
+		int in = indent();
 
-        if (n == -1)
-            n = in;
-        else
-            if (in > n)
-                n = in;
-        
-        pendingEvent = '{';
+		if (n == -1)
+			n = in;
+		else if (in > n)
+			n = in;
 
-        int i = 0;
-        while (true) {
-            if (! indent(n)) break;
-            if (! nmap_entry(n) ) break;
-            i++;
-        }
+		pendingEvent = '{';
+
+		int i = 0;
+		while (true) {
+			if (!indent(n)) break;
+			if (!nmap_entry(n)) break;
+			i++;
+		}
 // System.out.println("----------------------- 11");
-        if (i>0) {
-            event.event(MAP_CLOSE);
-            unmark();
-            return true;
-        }
+		if (i > 0) {
+			event.event(MAP_CLOSE);
+			unmark();
+			return true;
+		}
 // System.out.println("----------------------- 12");
-        pendingEvent = 0;
-        reset();
-        return false;
-    }
+		pendingEvent = 0;
+		reset();
+		return false;
+	}
 
-    /** nmap_entry(n) ::= key(n) ':' value(&gt;n) */
+	/**
+	 * nmap_entry(n) ::= key(n) ':' value(&gt;n)
+	 */
 
-    public boolean nmap_entry(int n) throws IOException, SyntaxException
-    {
-        if (!key(n)) return false;
-        if ( r.current() != ':') return false;
-        r.read();
+	public boolean nmap_entry(int n) throws IOException, SyntaxException {
+		if (!key(n)) return false;
+		if (r.current() != ':') return false;
+		r.read();
 
-        event.event(MAP_SEPARATOR);
-        space();    /* enforce this space? */
+		event.event(MAP_SEPARATOR);
+		space();    /* enforce this space? */
 
-        if (! loose_value(n+1)) throw new SyntaxException("no value after ':'",line);
+		if (!loose_value(n + 1)) throw new SyntaxException("no value after ':'", line);
 
-        return true;
-    }
+		return true;
+	}
 
-    /** nlist(n) ::= ( indent(n) nlist_entry(n) )+  */
+	/**
+	 * nlist(n) ::= ( indent(n) nlist_entry(n) )+
+	 */
 
-    public boolean nlist(int n) throws IOException, SyntaxException
-    {
-        mark();
+	public boolean nlist(int n) throws IOException, SyntaxException {
+		mark();
 
-        int in = indent();
+		int in = indent();
 
-        if (n == -1)
-            n = in;
-        else
-            if (in > n)
-                n = in;
+		if (n == -1)
+			n = in;
+		else if (in > n)
+			n = in;
 
-        pendingEvent = '[';
+		pendingEvent = '[';
 
-        int i=0;
-        while (true) {
-            if (! indent(n)) break;
-            if (!nlist_entry(n)) break;
-            i++;
-        }
+		int i = 0;
+		while (true) {
+			if (!indent(n)) break;
+			if (!nlist_entry(n)) break;
+			i++;
+		}
 
-        if (i>0) {
-            event.event(LIST_CLOSE);
-            unmark();
-            return true;
-        }
+		if (i > 0) {
+			event.event(LIST_CLOSE);
+			unmark();
+			return true;
+		}
 
-        pendingEvent = 0;
-        reset();
-        return false;
-    }
+		pendingEvent = 0;
+		reset();
+		return false;
+	}
 
-    boolean start_list() throws IOException{
-    	r.mark();
-    	if (r.read() == '-'){
-    		if (YamlCharacter.isLineBreakChar((char)r.current()) || space()){
-    			r.unmark();
-    			return true;
-    		}
-    	}
-    	r.reset();
-    	return false;
-    	
-    		
-    }
-    
-    /** nlist_entry(n) ::= '-' ( value(&gt;n) | nmap_inlist(&gt;n) ) */
+	boolean start_list() throws IOException {
+		r.mark();
+		if (r.read() == '-') {
+			if (YamlCharacter.isLineBreakChar((char) r.current()) || space()) {
+				r.unmark();
+				return true;
+			}
+		}
+		r.reset();
+		return false;
 
-    public boolean nlist_entry(int n) throws IOException, SyntaxException
-    {
-        if (!start_list()) return false;
+
+	}
+
+	/**
+	 * nlist_entry(n) ::= '-' ( value(&gt;n) | nmap_inlist(&gt;n) )
+	 */
+
+	public boolean nlist_entry(int n) throws IOException, SyntaxException {
+		if (!start_list()) return false;
 
 // System.out.println("nlist_entry");
-        space();
+		space();
 //        if (!space())
 //            throw new SyntaxException("No space after nested list entry",line);
 
-        if (nmap_inlist(n+1) || value(n+1) ) {
-            return true;
-        }
+		if (nmap_inlist(n + 1) || value(n + 1)) {
+			return true;
+		}
 
-        throw new SyntaxException ("bad nlist",line);
-    }
+		throw new SyntaxException("bad nlist", line);
+	}
 
-    /** nmap_inlist(n) ::= space string space? ':' space value(&gt;n) nmap(&gt;n)?  XXX */
+	/**
+	 * nmap_inlist(n) ::= space string space? ':' space value(&gt;n) nmap(&gt;n)?  XXX
+	 */
 
-    public boolean nmap_inlist(int n) throws IOException, SyntaxException
-    {
-        mark();
-        
+	public boolean nmap_inlist(int n) throws IOException, SyntaxException {
+		mark();
+
 // System.out.println("nmap_inlist()-1");
-        if (! string()) {
-            reset();
-            return false;
-        }
-        
+		if (!string()) {
+			reset();
+			return false;
+		}
+
 // System.out.println("nmap_inlist()-2");
-        space();
+		space();
 // System.out.println("nmap_inlist()-3");
-        if (r.read() != ':') {
-             reset();
-             return false;
-        }
-        if (pendingEvent == '['){
-            event.event(LIST_OPEN);
-            pendingEvent = 0;
-        }
-        event.event(MAP_OPEN);
-        sendEvents();
-        event.event(MAP_SEPARATOR);
+		if (r.read() != ':') {
+			reset();
+			return false;
+		}
+		if (pendingEvent == '[') {
+			event.event(LIST_OPEN);
+			pendingEvent = 0;
+		}
+		event.event(MAP_OPEN);
+		sendEvents();
+		event.event(MAP_SEPARATOR);
 // System.out.println("nmap_inlist()-4");
-        if (! space()) {
-            reset();
-            return false;
-        }
+		if (!space()) {
+			reset();
+			return false;
+		}
 // System.out.println("nmap_inlist()-5");
-        if (! value(n+1))
-            throw new SyntaxException("No value after ':' in map_in_list",line);
+		if (!value(n + 1))
+			throw new SyntaxException("No value after ':' in map_in_list", line);
 // System.out.println("nmap_inlist()-6");
-        
-        
-        n = n+1;
-        int in = indent();
-
-        if (n == -1)
-            n = in;
-        else
-            if (in > n)
-                n = in;
-        
-        
-
-        int i = 0;
-        while (true) {
-            if (! indent(n)) break;
-            if (! nmap_entry(n) ) break;
-            i++;
-        }
-        event.event(MAP_CLOSE);
-        unmark();
-        return true;
-        
-        
-    }
-
-    /** block(n) ::= '|' space? number? space? newline block_line(n)* */
-
-    public boolean block(int n) throws IOException, SyntaxException
-    {
-        int c = r.current();
-        if (c != '|' && c != ']' && c != '>') return false;
-
-        r.read();
-        if (r.current() == '\\') r.read();
-
-        space();
-        if (number())
-            space();
-
-        if (!newline()) throw new SyntaxException("No newline after block definition",line);
-
-        StringBuffer sb = new StringBuffer();
-        int block_indent = block_line(n, -1, sb, (char) c);
-        while ( -1 != block_line(n, block_indent, sb, (char) c) ) ;
-        String blockString = sb.toString();
-        if (blockString.length() > 0 && YamlCharacter.isLineBreakChar(blockString.charAt(blockString.length() - 1)))
-            blockString = blockString.substring(0, blockString.length() - 1);
-        event.content("string", blockString);
-
-        return true;
-    }
-
-    /* block_line(n) ::= indent(n) linesp? newline */
-
-    public int block_line(int n, int block_indent, StringBuffer sb, char ch) throws IOException, SyntaxException
-    {
-        int in = 0;
-        if (block_indent == -1){
-            in = indent();
-            if (in < n)
-                return -1;
-            n = in;
-            indent(n);
-        }else{
-            in = block_indent;
-            if (!indent(block_indent))
-                return -1;
-        }
-
-        if (r.current() == -1)
-            return -1;
-        
-        mark();
-
-        linesp();
-        sb.append( r.string() );
-
-        unmark();
-
-        if (ch == '|')
-            sb.append('\n');
-        else
-            sb.append(' ');
-
-        newline();
-        return in;
-    }
-
-    /** list ::= '[' (list_entry ',')* list_entry? ']' */
-
-    public boolean list() throws IOException, SyntaxException
-    {
-        if ( r.current() != '[') return false;
-        r.read();
-        sendEvents();
-        event.event(LIST_OPEN);
-        
-        while (list_entry())
-        {
-            int c = r.current();
-            if (c == ']')
-            {
-                r.read();
-                event.event(LIST_CLOSE);
-                return true;
-            }
-            if (c != ',')
-                throw new SyntaxException("inline list error: expecting ','",line);
-            r.read();
-        }
-        int c = r.current();
-        if (c == ']'){
-            r.read();
-            event.event(LIST_CLOSE);
-            return true;
-        }else
-        	throw new SyntaxException("inline list error",line);
-    }
-
-    /** list_entry ::= space? value_inline space? */
-
-    public boolean list_entry() throws IOException, SyntaxException
-    {
-        space();
-
-        if (!loose_value_inline())
-            return false;
-
-        space();
-        return true;
-    }
-
-    /** map ::= '{' (map_entry ',')* map_entry? '}'  */
-
-    public boolean map() throws IOException, SyntaxException
-    {
-        if ( r.current() != '{') return false;
-        r.read();
-        sendEvents();
-        event.event(MAP_OPEN);
-
-        while (map_entry())
-        {
-            int c = r.current();
-            if (c == '}')
-            {
-                r.read();
-                event.event(MAP_CLOSE);
-                return true;
-            }
-            if (c != ',')
-                throw new SyntaxException("inline map error: expecting ','",line);
-            r.read();
-        }
-        int c = r.current();
-        if (c == '}')
-        {
-            r.read();
-            event.event(MAP_CLOSE);
-            return true;
-        }
-        throw new SyntaxException("inline map error",line);
-    }
-
-    /** map_entry ::= space? value_inline space? ':' space value_inline space? */
-
-    public boolean map_entry() throws IOException, SyntaxException
-    {
-        space();
-
-        if (!value_inline())
-            return false;
-
-        space();
-
-        if (r.current() != ':')
-            return false;
-
-        r.read();
-
-        event.event(MAP_SEPARATOR);
-
-        if (!space())
-            throw new SyntaxException("No space after ':'",line);
-
-        if (!loose_value_inline())
-            throw new SyntaxException("No value after ':'",line);
-
-        space();
-        return true;
-    }
 
 
-    /** document_first ::= nlist(-1) | nmap(-1) */
+		n = n + 1;
+		int in = indent();
 
-    public boolean document_first() throws IOException, SyntaxException
-    {
-        boolean b = nlist(-1) || nmap(-1);
-        mark();
-        
-        if (!header() && r.read() != YamlCharacter.EOF && r.read() != YamlCharacter.EOF) // Hacky hack here, want to call read() twice
-        																				 // which changes the reader's state
-        	throw new SyntaxException("End of document expected.");
-        unmark();
+		if (n == -1)
+			n = in;
+		else if (in > n)
+			n = in;
+
+
+		int i = 0;
+		while (true) {
+			if (!indent(n)) break;
+			if (!nmap_entry(n)) break;
+			i++;
+		}
+		event.event(MAP_CLOSE);
+		unmark();
+		return true;
+
+
+	}
+
+	/**
+	 * block(n) ::= '|' space? number? space? newline block_line(n)*
+	 */
+
+	public boolean block(int n) throws IOException, SyntaxException {
+		int c = r.current();
+		if (c != '|' && c != ']' && c != '>') return false;
+
+		r.read();
+		if (r.current() == '\\') r.read();
+
+		space();
+		if (number())
+			space();
+
+		if (!newline()) throw new SyntaxException("No newline after block definition", line);
+
+		StringBuffer sb = new StringBuffer();
+		int block_indent = block_line(n, -1, sb, (char) c);
+		while (-1 != block_line(n, block_indent, sb, (char) c)) ;
+		String blockString = sb.toString();
+		if (blockString.length() > 0 && YamlCharacter.isLineBreakChar(blockString.charAt(blockString.length() - 1)))
+			blockString = blockString.substring(0, blockString.length() - 1);
+		event.content("string", blockString);
+
+		return true;
+	}
+
+	/* block_line(n) ::= indent(n) linesp? newline */
+
+	public int block_line(int n, int block_indent, StringBuffer sb, char ch) throws IOException, SyntaxException {
+		int in = 0;
+		if (block_indent == -1) {
+			in = indent();
+			if (in < n)
+				return -1;
+			n = in;
+			indent(n);
+		} else {
+			in = block_indent;
+			if (!indent(block_indent))
+				return -1;
+		}
+
+		if (r.current() == -1)
+			return -1;
+
+		mark();
+
+		linesp();
+		sb.append(r.string());
+
+		unmark();
+
+		if (ch == '|')
+			sb.append('\n');
+		else
+			sb.append(' ');
+
+		newline();
+		return in;
+	}
+
+	/**
+	 * list ::= '[' (list_entry ',')* list_entry? ']'
+	 */
+
+	public boolean list() throws IOException, SyntaxException {
+		if (r.current() != '[') return false;
+		r.read();
+		sendEvents();
+		event.event(LIST_OPEN);
+
+		while (list_entry()) {
+			int c = r.current();
+			if (c == ']') {
+				r.read();
+				event.event(LIST_CLOSE);
+				return true;
+			}
+			if (c != ',')
+				throw new SyntaxException("inline list error: expecting ','", line);
+			r.read();
+		}
+		int c = r.current();
+		if (c == ']') {
+			r.read();
+			event.event(LIST_CLOSE);
+			return true;
+		} else
+			throw new SyntaxException("inline list error", line);
+	}
+
+	/**
+	 * list_entry ::= space? value_inline space?
+	 */
+
+	public boolean list_entry() throws IOException, SyntaxException {
+		space();
+
+		if (!loose_value_inline())
+			return false;
+
+		space();
+		return true;
+	}
+
+	/**
+	 * map ::= '{' (map_entry ',')* map_entry? '}'
+	 */
+
+	public boolean map() throws IOException, SyntaxException {
+		if (r.current() != '{') return false;
+		r.read();
+		sendEvents();
+		event.event(MAP_OPEN);
+
+		while (map_entry()) {
+			int c = r.current();
+			if (c == '}') {
+				r.read();
+				event.event(MAP_CLOSE);
+				return true;
+			}
+			if (c != ',')
+				throw new SyntaxException("inline map error: expecting ','", line);
+			r.read();
+		}
+		int c = r.current();
+		if (c == '}') {
+			r.read();
+			event.event(MAP_CLOSE);
+			return true;
+		}
+		throw new SyntaxException("inline map error", line);
+	}
+
+	/**
+	 * map_entry ::= space? value_inline space? ':' space value_inline space?
+	 */
+
+	public boolean map_entry() throws IOException, SyntaxException {
+		space();
+
+		if (!value_inline())
+			return false;
+
+		space();
+
+		if (r.current() != ':')
+			return false;
+
+		r.read();
+
+		event.event(MAP_SEPARATOR);
+
+		if (!space())
+			throw new SyntaxException("No space after ':'", line);
+
+		if (!loose_value_inline())
+			throw new SyntaxException("No value after ':'", line);
+
+		space();
+		return true;
+	}
+
+
+	/**
+	 * document_first ::= nlist(-1) | nmap(-1)
+	 */
+
+	public boolean document_first() throws IOException, SyntaxException {
+		boolean b = nlist(-1) || nmap(-1);
+		mark();
+
+		if (!header() && r.read() != YamlCharacter.EOF && r.read() != YamlCharacter.EOF) // Hacky hack here, want to call read() twice
+			// which changes the reader's state
+			throw new SyntaxException("End of document expected.");
+		unmark();
 //    	if (!value_na(-1)) throw new SyntaxException("first document is not a nested list or map",line);
-        if ( ! b ) throw new SyntaxException("first document is not a nested list or map",line);
-        return true;
-    }
+		if (!b) throw new SyntaxException("first document is not a nested list or map", line);
+		return true;
+	}
 
-    /** document_next ::= header node_non_alias(-1) */
+	/**
+	 * document_next ::= header node_non_alias(-1)
+	 */
 
-    public boolean document_next() throws IOException, SyntaxException
-    {
-        if (!header()) return false;
+	public boolean document_next() throws IOException, SyntaxException {
+		if (!header()) return false;
 //        	throw new SyntaxException("Expected beginning of document",line);
-        if (!value_na(-1)) return false;
-        return true;
-    }
+		if (!value_na(-1)) return false;
+		return true;
+	}
 
-    /** parse ::= icomment(-1)* document_first? document_next*  */
+	/**
+	 * parse ::= icomment(-1)* document_first? document_next*
+	 */
 
-    public void parse() throws IOException, SyntaxException
-    {
-        try {
-            while (comment(-1,false));
-            
-            if (!header())
-               document_first();
-            else
-                value_na(-1);
+	public void parse() throws IOException, SyntaxException {
+		try {
+			while (comment(-1, false)) ;
 
-            while (document_next());
-        }
-        catch (SyntaxException e)
-        {
-            event.error(e,e.line);
-        }
-    }
+			if (!header())
+				document_first();
+			else
+				value_na(-1);
 
-    /* ----------------------------------------------------- */
+			while (document_next()) ;
+		} catch (SyntaxException e) {
+			event.error(e, e.line);
+		}
+	}
 
-    private void mark()
-    {
-        r.mark();
-    }
+	/* ----------------------------------------------------- */
 
-    private void reset()
-    {
-        r.reset();
-    }
+	private void mark() {
+		r.mark();
+	}
 
-    private void unmark()
-    {
-        r.unmark();
-    }
+	private void reset() {
+		r.reset();
+	}
 
-    /**
-     * @return Returns the event.
-     */
-    public ParserEvent getEvent() {
-        return event;
-    }
+	private void unmark() {
+		r.unmark();
+	}
 
-    /**
-     * @param event The event to set.
-     */
-    public void setEvent(ParserEvent event) {
-        this.event = event;
-    }
-    
-    public int getLineNumber(){
-        return line;
-    }
-    
+	/**
+	 * @return Returns the event.
+	 */
+	public ParserEvent getEvent() {
+		return event;
+	}
 
-	public static void parse(File file) throws FileNotFoundException{
+	/**
+	 * @param event The event to set.
+	 */
+	public void setEvent(ParserEvent event) {
+		this.event = event;
+	}
+
+	public int getLineNumber() {
+		return line;
+	}
+
+
+	public static void parse(File file) throws FileNotFoundException {
 		parse(new FileReader(file));
 	}
-	
-	public static void parse(String yamlText){
+
+	public static void parse(String yamlText) {
 		parse(new StringReader(yamlText));
 	}
-	
+
 	public static void parse(Reader reader) {
 		try {
-			ParserEvent handler = new TestYamlParserEvent();
-			YamlParser y = new YamlParser(reader,handler);
+			ParserEvent handler = new YamlParserEvent();
+			YamlParser y = new YamlParser(reader, handler);
 			y.parse();
 			reader.close();
 		} catch (IOException e) {

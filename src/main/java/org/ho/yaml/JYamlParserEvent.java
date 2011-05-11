@@ -81,7 +81,7 @@ class JYamlParserEvent extends YamlParserEvent {
 		stack.peek().nextOnProperty(a, b);
 	}
 
-	public Object getBean() {	
+	public Object getBean() {
 		return stack.peek().getWrapper().getObject();
 	}
 

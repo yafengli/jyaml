@@ -22,40 +22,39 @@
  */
 package org.ho.yaml.wrapper;
 
+import org.ho.yaml.YamlConfig;
+import org.ho.yaml.exception.ObjectCreationException;
+
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.ho.yaml.YamlConfig;
-import org.ho.yaml.exception.ObjectCreationException;
 
 public abstract class AbstractWrapper implements ObjectWrapper {
 
 	protected Class type;
 	protected Object object;
 	protected List<CreateListener> listeners = new ArrayList<CreateListener>();
-    protected boolean objectInitialized = false;
+	protected boolean objectInitialized = false;
 	protected YamlConfig config;
-        
-	protected AbstractWrapper(Class type){
+
+	protected AbstractWrapper(Class type) {
 		this.type = type;
 	}
-    
-    protected void fireCreated(){
-        for (CreateListener listener: listeners)
-            listener.created(object);
-    }
-	
-	protected Object createObject(){
-	    try{
-	        if (config.isConstructorAccessibleForDecoding(type)){
-	            Constructor constr = type.getDeclaredConstructor(null);
-	            constr.setAccessible(true);
-	            return constr.newInstance();
-	        }else
-                throw new ObjectCreationException("Default constructor for " + type + " is not accessible.");
-	    }catch(Exception e)
-		{
+
+	protected void fireCreated() {
+		for (CreateListener listener : listeners)
+			listener.created(object);
+	}
+
+	protected Object createObject() {
+		try {
+			if (config.isConstructorAccessibleForDecoding(type)) {
+				Constructor constr = type.getDeclaredConstructor(null);
+				constr.setAccessible(true);
+				return constr.newInstance();
+			} else
+				throw new ObjectCreationException("Default constructor for " + type + " is not accessible.");
+		} catch (Exception e) {
 			throw new ObjectCreationException("Can't create object of type " + type + " using default constructor.", e);
 		}
 	}
@@ -71,42 +70,42 @@ public abstract class AbstractWrapper implements ObjectWrapper {
 		return type;
 	}
 
-    public void setObject(Object obj) {
-        if (obj == null){
-            object = null;
-            objectInitialized = true;
-        }else{
-            object = obj;
-            objectInitialized = true;
-            fireCreated();
-        }
-        
-    }
+	public void setObject(Object obj) {
+		if (obj == null) {
+			object = null;
+			objectInitialized = true;
+		} else {
+			object = obj;
+			objectInitialized = true;
+			fireCreated();
+		}
 
-    public Object getObject() {
-        if (!objectInitialized){
-            setObject(createObject());
-            return object;
-        }else
-            return object;
-    }
+	}
 
-    public Object createPrototype() {
-        return createObject();
-    }
+	public Object getObject() {
+		if (!objectInitialized) {
+			setObject(createObject());
+			return object;
+		} else
+			return object;
+	}
 
-    @Override
-    public String toString() {
-        return object == null? "[" + getType() + "]" : "[" + object + "]";
-    }
+	public Object createPrototype() {
+		return createObject();
+	}
 
-    public ObjectWrapper makeWrapper() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	@Override
+	public String toString() {
+		return object == null ? "[" + getType() + "]" : "[" + object + "]";
+	}
 
-    public void setYamlConfig(YamlConfig config){
-        this.config = config;
-    }
-    
+	public ObjectWrapper makeWrapper() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void setYamlConfig(YamlConfig config) {
+		this.config = config;
+	}
+
 }

@@ -7,12 +7,14 @@ import test.bean.Info;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 public class YAMLTest {
 
-	@Test
+	//	@Test
 	public void testConfig() {
 		// First load a YAML string into an object
 		String dog = "---\n  animal: dog\n  qualities:\n    - loyal\n    - friendly\n    - furry\n";
@@ -37,7 +39,7 @@ public class YAMLTest {
 		}
 	}
 
-	@Test
+	//	@Test
 	public void testDemo() {
 		String s = "---\n  a: cat\n  dog:\n    - loyal\n    - friendly\n    - furry\n";
 		System.out.println(s);
@@ -55,9 +57,23 @@ public class YAMLTest {
 		System.out.printf("$file absolute path:$%s\n", f.getAbsolutePath());
 		try {
 			Object obj = Yaml.load(f);
-			System.out.println(obj);
+			if (obj != null && obj instanceof Map) {
+				for (Object key : ((Map) obj).keySet()) {
+					Object val=((Map) obj).get(key);
+					System.out.printf("^:%s,%s\n", key.getClass().getName(), val.getClass().getName());
+					if(val instanceof Collection){
+						for(Iterator it=((Collection) val).iterator();it.hasNext();){
+							Object item=it.next();
+							System.out.printf("^^^:%s,%s\n",item.getClass().getName(),item);
+						}
+					}
+				}
+			}
 			Entity entity = Yaml.loadType(f, Entity.class);
-			System.out.println(entity);
+			System.out.printf("%s,%s\n", entity, entity.getReceipts().getClass());
+			for (Iterator it = entity.getReceipts().iterator(); it.hasNext();) {
+				System.out.printf("class:%s\n", it.next().getClass());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
