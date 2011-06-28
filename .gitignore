@@ -2,4 +2,4 @@
 1.txt
 .class*
 .project
-.settings/**
+.settings/
