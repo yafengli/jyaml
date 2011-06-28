@@ -14,7 +14,7 @@ import java.util.Map;
 
 public class YAMLTest {
 
-	//	@Test
+	@Test
 	public void testConfig() {
 		// First load a YAML string into an object
 		String dog = "---\n  animal: dog\n  qualities:\n    - loyal\n    - friendly\n    - furry\n";
@@ -25,7 +25,7 @@ public class YAMLTest {
 		System.out.println("");
 		System.out.println(Yaml.dump(test, true));
 
-		//type
+		// type
 		Info info = Yaml.loadType(dog, Info.class);
 		System.out.println(Yaml.dump(info, true));
 		System.out.println("Dog: " + test);
@@ -39,12 +39,13 @@ public class YAMLTest {
 		}
 	}
 
-	//	@Test
+	@Test
 	public void testDemo() {
 		String s = "---\n  a: cat\n  dog:\n    - loyal\n    - friendly\n    - furry\n";
 		System.out.println(s);
 		Map a = (Map) Yaml.load(s);
-		System.out.println("This should print loyal: " + ((List) a.get("dog")).get(0));
+		System.out.println("This should print loyal: "
+				+ ((List) a.get("dog")).get(0));
 
 		String s2 = Yaml.dump(a);
 		System.out.println("Here is the object encoded back to a YAML string:");
@@ -59,18 +60,22 @@ public class YAMLTest {
 			Object obj = Yaml.load(f);
 			if (obj != null && obj instanceof Map) {
 				for (Object key : ((Map) obj).keySet()) {
-					Object val=((Map) obj).get(key);
-					System.out.printf("^:%s,%s\n", key.getClass().getName(), val.getClass().getName());
-					if(val instanceof Collection){
-						for(Iterator it=((Collection) val).iterator();it.hasNext();){
-							Object item=it.next();
-							System.out.printf("^^^:%s,%s\n",item.getClass().getName(),item);
+					Object val = ((Map) obj).get(key);
+					System.out.printf("^:%s,%s\n", key.getClass().getName(),
+							val.getClass().getName());
+					if (val instanceof Collection) {
+						for (Iterator it = ((Collection) val).iterator(); it
+								.hasNext();) {
+							Object item = it.next();
+							System.out.printf("^^^:%s,%s\n", item.getClass()
+									.getName(), item);
 						}
 					}
 				}
 			}
 			Entity entity = Yaml.loadType(f, Entity.class);
-			System.out.printf("%s,%s\n", entity, entity.getReceipts().getClass());
+			System.out.printf("%s,%s\n", entity, entity.getReceipts()
+					.getClass());
 			for (Iterator it = entity.getReceipts().iterator(); it.hasNext();) {
 				System.out.printf("class:%s\n", it.next().getClass());
 			}
