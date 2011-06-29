@@ -7,3 +7,6 @@ receipts:
   - store: la madeleine
     category: "dining out: breakfest"
     total: 13.2
+  - store: "test"
+    category: "what the fuck!"
+    total: 24.65    

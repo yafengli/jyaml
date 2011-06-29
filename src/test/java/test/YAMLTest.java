@@ -1,9 +1,11 @@
 package test;
 
 import org.ho.yaml.Yaml;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import test.bean.Entity;
 import test.bean.Info;
+import test.bean.Receipty;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 public class YAMLTest {
+	private static File yamlFile;
+
+	@BeforeClass
+	public static void init() {
+		yamlFile = new File("src/test/resources/test.yml");
+	}
 
 	@Test
 	public void testConfig() {
@@ -53,11 +61,9 @@ public class YAMLTest {
 	}
 
 	@Test
-	public void testYaml() {
-		File f = new File("src/test/resources/test.yml");
-		System.out.printf("$file absolute path:$%s\n", f.getAbsolutePath());
+	public void testLoadByMap() {
 		try {
-			Object obj = Yaml.load(f);
+			Object obj = Yaml.load(yamlFile);
 			if (obj != null && obj instanceof Map) {
 				for (Object key : ((Map) obj).keySet()) {
 					Object val = ((Map) obj).get(key);
@@ -73,11 +79,20 @@ public class YAMLTest {
 					}
 				}
 			}
-			Entity entity = Yaml.loadType(f, Entity.class);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void testLoadByType() {
+		try {
+			Entity entity = Yaml.loadType(yamlFile, Entity.class);
 			System.out.printf("%s,%s\n", entity, entity.getReceipts()
 					.getClass());
-			for (Iterator it = entity.getReceipts().iterator(); it.hasNext();) {
-				System.out.printf("class:%s\n", it.next().getClass());
+			for (Receipty rty : entity.getReceipts()) {
+				System.out.printf("item:%s,%s,%s\n", rty.getStore(),
+						rty.getCategory(), rty.getTotal());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
