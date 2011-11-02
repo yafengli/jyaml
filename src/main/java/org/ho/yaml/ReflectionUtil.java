@@ -346,12 +346,14 @@ public class ReflectionUtil {
     		return config.transfer2classname(transfer);
     }
     
-    static Class getArrayTypeHelper(String classname){
+    static Class getArrayTypeHelper(String classname){		
         if (!isArrayName(classname))
             return classForName(classname);
-        else
-            return Array.newInstance(
-                    getArrayTypeHelper(arrayComponentName(classname)), 0).getClass();
+        else{
+			Class c= getArrayTypeHelper(arrayComponentName(classname));
+			Object obj=Array.newInstance(c, 0);
+			return obj.getClass();
+		}
     }
     
     public static String className(Class clazz){
