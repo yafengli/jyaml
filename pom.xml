@@ -36,7 +36,7 @@
 		<repository>
 			<id>deploymentRepo</id>
 			<name>Nexus Deploy</name>
-			<url>http://221.231.148.247/nexus/content/repositories/thirdparty</url>
+			<url>http://221.231.148.201:8081/nexus/content/repositories/thirdparty</url>
 		</repository>
 	</distributionManagement>
 	<build>
