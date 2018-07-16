@@ -1,6 +1,7 @@
 package test;
 
 import org.ho.yaml.Yaml;
+import org.ho.yaml.YamlConfig;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import test.bean.Entity;
@@ -20,7 +21,7 @@ public class YAMLTest {
 
   @BeforeClass
   public static void init() {
-    Yaml.config.setDateFormat("yyyy-MM-dd");
+    YamlConfig.getDefaultConfig().setDateFormat("yyyy-MM-dd");
 
     yamlFile = new File("src/test/resources/test.yml");
   }

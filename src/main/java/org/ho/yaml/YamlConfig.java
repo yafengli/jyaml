@@ -93,7 +93,8 @@ public class YamlConfig implements YamlOperations, Cloneable {
 
   BiDirectionalMap<String, String> transfers = null;
 
-  private String dateFormat = null;
+  //private String dateFormat = null;
+  private String dateFormat = "yyyy-MM-dd";
   private DateFormat dateFormatter = null;
 
   Map<String, String> decodingAccessScope = new HashMap<String, String>();
@@ -342,7 +343,7 @@ public class YamlConfig implements YamlOperations, Cloneable {
 
   public void setDateFormat(String dateFormat) {
     this.dateFormat = dateFormat;
-    System.out.println("1 dateFormat:" + this.dateFormat);
+    System.out.println("this:" + this.hashCode() + " 1 dateFormat:" + this.dateFormat);
     this.dateFormatter = null; // ensure dateFormatter will be rebuilt
   }
 
@@ -354,11 +355,9 @@ public class YamlConfig implements YamlOperations, Cloneable {
    * @author Steve Leach
    */
   public DateFormat getDateFormatter() {
-    System.out.println(2 + " dateFormatter:" + this.dateFormatter + " dateFormat:" + this.dateFormat + " " + this.getDateFormat());
     if (dateFormatter == null) {
       if (dateFormat != null) {
         dateFormatter = new DateTimeParser(dateFormat);
-        System.out.println(3 + " dateFormatter:" + dateFormatter + " dateFormat" + dateFormat);
       }
     }
     return dateFormatter;

@@ -1,6 +1,5 @@
-!!test
 date: 2003-07-25
-birthday: 1977-09-07 12:00:01
+birthday: 1977-09-07
 receipts:
   - store: la madeleine
     category: "dining out: lunch"
