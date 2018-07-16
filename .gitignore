@@ -4,3 +4,7 @@
 .project
 .settings/
 target/
+.gradle
+.vscode
+bin/
+.classpath

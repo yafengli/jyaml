@@ -1,0 +1,17 @@
+plugins {
+    id "com.jfrog.bintray" version "1.8.4"
+    id "java"
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')    
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile("ch.qos.logback:logback-classic:${logback}")
+    testCompile("junit:junit:${junit}")
+}
