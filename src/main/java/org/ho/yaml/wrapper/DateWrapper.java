@@ -68,6 +68,7 @@ public class DateWrapper extends DefaultSimpleTypeWrapper implements WrapperFact
     Date parseDate(String s)
     {
         DateFormat fmt = config.getDateFormatter();
+        System.out.println("fmt:"+fmt+" s:"+s);
         if (fmt != null) {
             try {
                 return fmt.parse(s);

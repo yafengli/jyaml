@@ -5,7 +5,7 @@ plugins {
 
 bintray {
     user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')    
+    key = System.getenv('BINTRAY_KEY')
 }
 
 sourceCompatibility = 1.8
@@ -13,5 +13,15 @@ targetCompatibility = 1.8
 
 dependencies {
     compile("ch.qos.logback:logback-classic:${logback}")
-    testCompile("junit:junit:${junit}")
+    testCompile("org.yaml:snakeyaml:${snakeyaml}", "junit:junit:${junit}")
+}
+
+task sampleTest(type: Test, dependsOn: testClasses) {
+    include '**/*Test'
+}
+
+tasks.withType(Test) {
+    testLogging {
+        events 'started', 'passed'
+    }
 }
