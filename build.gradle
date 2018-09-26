@@ -8,8 +8,8 @@ bintray {
     key = System.getenv('BINTRAY_KEY')
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 dependencies {
     compile("ch.qos.logback:logback-classic:${logback}")
