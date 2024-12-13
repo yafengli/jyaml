@@ -38,7 +38,7 @@ public class DateWrapper extends DefaultSimpleTypeWrapper implements WrapperFact
     public DateWrapper() {
         super(Date.class);
     }
-    
+
     @Override
     public Class expectedArgType() {
         return String.class;
@@ -55,42 +55,40 @@ public class DateWrapper extends DefaultSimpleTypeWrapper implements WrapperFact
     public void setObject(Object obj) {
         if (obj == null)
             super.setObject(null);
-        else if (obj instanceof Date){
+        else if (obj instanceof Date) {
             super.setObject(obj);
-        }else{
-            String arg = (String)obj;
+        } else {
+            String arg = (String) obj;
             super.setObject(parseDate(arg));
             if (!objectInitialized)
                 throw new YamlException("Can't instantiate " + getType() + " with literal " + arg);
         }
     }
-    
-    Date parseDate(String s)
-    {
+
+    Date parseDate(String s) {
         DateFormat fmt = config.getDateFormatter();
 
         if (fmt != null) {
             try {
                 return fmt.parse(s);
             } catch (ParseException e) {
-                throw new YamlException("Error parsing date: '" + s + "'", e );
+                throw new YamlException("Error parsing date: '" + s + "'", e);
             }
-        }
-        else {
+        } else {
             // Original method
             try {
                 return new Date(Long.parseLong(s));
-            } catch (NumberFormatException e){}
-            return new Date(s);
+            } catch (NumberFormatException e) {
+            }
+            return new Date();
         }
     }
 
-
     @Override
     public Object getOutputValue() {
-        return formateDate((Date)getObject());
+        return formateDate((Date) getObject());
     }
-    
+
     /**
      * Writes a date into the output, using the preferred format
      *
@@ -103,7 +101,7 @@ public class DateWrapper extends DefaultSimpleTypeWrapper implements WrapperFact
         if (fmt == null) {
             return "" + date.getTime();
         } else {
-            return "\"" + fmt.format(date) + "\"" ;
+            return "\"" + fmt.format(date) + "\"";
         }
     }
 

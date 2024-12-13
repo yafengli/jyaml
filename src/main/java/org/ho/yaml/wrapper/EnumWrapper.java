@@ -39,24 +39,24 @@ public class EnumWrapper extends AbstractWrapper implements SimpleObjectWrapper 
 
     public Object getOutputValue() {
         try {
-            return getType().getMethod("name", null).invoke(getObject(), null);
-        } catch (Exception e){
+            return getType().getMethod("name").invoke(getObject());
+        } catch (Exception e) {
             throw new Error("Error getting enum value", e);
         }
     }
 
     @Override
     public void setObject(Object obj) {
-        if (obj instanceof String){
+        if (obj instanceof String) {
             try {
-                super.setObject(getType().getMethod("valueOf", new Class[]{String.class}).invoke(getType(), new Object[]{obj}));
-            } catch (Exception e){
+                super.setObject(getType().getMethod("valueOf", new Class[] { String.class }).invoke(getType(),
+                        new Object[] { obj }));
+            } catch (Exception e) {
                 throw new YamlException("Problem getting " + obj + " value of enum type " + type, e);
             }
-        }else
+        } else
             super.setObject(obj);
-                
+
     }
 
-    
 }
