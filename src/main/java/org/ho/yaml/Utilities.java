@@ -28,103 +28,108 @@ import org.ho.yaml.exception.YamlException;
 
 public class Utilities {
 
-    public static Object decodeSimpleType(String content){
-        if ("~".equals(content)){
+    public static Object decodeSimpleType(String content) {
+        if ("~".equals(content)) {
             return null;
-        }else{
+        } else {
             try {
-                return new Integer(content); // return integer
-            } catch (NumberFormatException e) {}
+                return Integer.parseInt(content); // return integer
+            } catch (NumberFormatException e) {
+            }
             try {
-                return new Double(content);
-            }catch (NumberFormatException e) {}
-            catch (NullPointerException e){} 
-            // UMM... this surprised me, but the double parser can throw NullPointerExceptions
+                return Double.parseDouble(content);
+            } catch (NumberFormatException e) {
+            } catch (NullPointerException e) {
+            }
+            // UMM... this surprised me, but the double parser can throw
+            // NullPointerExceptions
             // on non-null input, this this is buggy
-        
+
             if ("true".equalsIgnoreCase(content) || "false".equalsIgnoreCase(content))
-                return new Boolean(content); // return boolean
-            else return content; // return String
+                return Boolean.parseBoolean(content); // return boolean
+            else
+                return content; // return String
         }
     }
 
-    public static String quote(Object value){
+    public static String quote(Object value) {
         return "\"" + value + "\"";
     }
 
-    public static String stringify(Object value){
+    public static String stringify(Object value) {
         return stringify(value, "");
     }
-    
-    public static String escape(String text){
-    	text = text.replace("\\", "\\\\");
+
+    public static String escape(String text) {
+        text = text.replace("\\", "\\\\");
         text = text.replace("\b", "\\b");
         text = text.replace("\0", "\\0");
         text = text.replace("\t", "\\t");
         text = text.replace("\"", "\\\"");
         return text;
     }
-    
-    public static String unescape(String text){
-        if (text == null) return null;
+
+    public static String unescape(String text) {
+        if (text == null)
+            return null;
         StringBuffer sb = new StringBuffer(text.length());
-        for (int i = 0; i < text.length(); i++){
-        	char c = text.charAt(i);
-        	if (c == '\\' && i != text.length() - 1){
-        		char d = text.charAt(i + 1);
-        		switch(d){
-        		case 'b':
-        			sb.append('\b');
-        			break;
-        		case '0':
-        			sb.append('\0');
-        			break;
-        		case 't':
-        			sb.append('\t');
-        			break;
-        		case 'n':
-        			sb.append('\n');
-        			break;
-        		case '"':
-        			sb.append('"');
-        			break;
-        		case '\\':
-        			sb.append('\\');
-        			break;
-        		default:
-        			sb.append(("" + c) + d);
-        		}
-        		i++;
-        	}else
-        		sb.append(c);
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c == '\\' && i != text.length() - 1) {
+                char d = text.charAt(i + 1);
+                switch (d) {
+                    case 'b':
+                        sb.append('\b');
+                        break;
+                    case '0':
+                        sb.append('\0');
+                        break;
+                    case 't':
+                        sb.append('\t');
+                        break;
+                    case 'n':
+                        sb.append('\n');
+                        break;
+                    case '"':
+                        sb.append('"');
+                        break;
+                    case '\\':
+                        sb.append('\\');
+                        break;
+                    default:
+                        sb.append(("" + c) + d);
+                }
+                i++;
+            } else
+                sb.append(c);
         }
         return sb.toString();
     }
-    
-    public static String stringify(Object value, String indent){
+
+    public static String stringify(Object value, String indent) {
         String text = value.toString();
-        
+
         // special handling for multiple lines
-        if (text.indexOf('\n') != -1){
+        if (text.indexOf('\n') != -1) {
             if (text.length() == 1)
                 return quote("\\n");
             StringBuffer sb = new StringBuffer();
             sb.append("|");
             String lines[] = text.split("\n");
-            for (int i = 0; i < lines.length; i++){
+            for (int i = 0; i < lines.length; i++) {
                 String line = lines[i];
                 sb.append("\n" + indent + line);
             }
             if (text.charAt(text.length() - 1) == '\n')
                 sb.append("\n" + indent);
             return sb.toString();
-        }else if ("".equals(text)){
+        } else if ("".equals(text)) {
             return quote(text);
-        }else{
+        } else {
             String indicators = ":[]{},\"'|*&";
             boolean quoteIt = false;
-            for (char c: indicators.toCharArray())
-                if (text.indexOf(c) != -1){
+            for (char c : indicators.toCharArray())
+                if (text.indexOf(c) != -1) {
                     quoteIt = true;
                     break;
                 }
@@ -132,54 +137,56 @@ public class Utilities {
                 quoteIt = true;
             if (isNumeric(text))
                 quoteIt = true;
-            if (quoteIt){
+            if (quoteIt) {
                 text = escape(text);
                 text = quote(text);
-            }else
-            	text = text;
+            }
             return text;
         }
     }
 
-    static boolean isNumeric(String str){
+    static boolean isNumeric(String str) {
         try {
             Long.parseLong(str);
             return true;
-        }catch (Exception e){}
-        try{
+        } catch (Exception e) {
+        }
+        try {
             Double.parseDouble(str);
             return true;
-        }catch (Exception e){}
+        } catch (Exception e) {
+        }
         return false;
     }
 
-    static String quote(String value){
+    static String quote(String value) {
         return "\"" + value + "\"";
     }
-    
-    public static Object convertType(String value, Class type){
+
+    public static Object convertType(String value, Class type) {
         if ("~".equals(value))
             return null;
         else if (type == Integer.class || type == Integer.TYPE)
-            return new Integer(value.toString());
-        else if (type == String.class){
-            return (String)value;
-        }else if (type == Long.class || type == Long.TYPE)
-            return new Long(value.toString());
+            return Integer.parseInt(value.toString());
+        else if (type == String.class) {
+            return (String) value;
+        } else if (type == Long.class || type == Long.TYPE)
+            return Long.parseLong(value.toString());
         else if (type == Short.class || type == Short.TYPE)
-            return new Short(value.toString());
+            return Short.parseShort(value.toString());
         else if (type == Double.class || type == Double.TYPE)
-            return new Double(value.toString());
+            return Double.parseDouble(value.toString());
         else if (type == Boolean.class || type == Boolean.TYPE)
-            return new Boolean(value.toString());
-        else if (type == Character.class || type == Character.TYPE){
-            value = value;
-            return new Character(value.charAt(0));
-        }else
+            return Boolean.parseBoolean(value.toString());
+        else if (type == Character.class || type == Character.TYPE) {
+            if (value.length() != 1)
+                throw new YamlException("Character must be a single character.");
+            return Character.valueOf(value.charAt(0));
+        } else
             return decodeSimpleType(value);
     }
-    
-    public static Class getWrapperClass(Class type){
+
+    public static Class getWrapperClass(Class type) {
         if (Integer.TYPE == type)
             return Integer.class;
         else if (Double.TYPE == type)
@@ -201,29 +208,27 @@ public class Utilities {
         else
             throw new YamlException(type + " is not a primitive type.");
     }
-    
-    public static boolean classEquals(Class one, Class other){
+
+    public static boolean classEquals(Class one, Class other) {
         if (one == other)
             return true;
         if (one != null && other != null)
             if (one.isPrimitive() || other.isPrimitive())
-                if (one.isPrimitive()){
+                if (one.isPrimitive()) {
                     return getWrapperClass(one) == other;
-                }else
+                } else
                     return one == getWrapperClass(other);
         return false;
-            
+
     }
 
-    public static boolean same(Object one, Object other){
-        if (one != null){
+    public static boolean same(Object one, Object other) {
+        if (one != null) {
             return one.equals(other);
-        }else if (other != null)
+        } else if (other != null)
             return other.equals(one);
-        else 
+        else
             return true;
     }
-    
-    
 
 }

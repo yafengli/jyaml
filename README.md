@@ -1,9 +1,9 @@
+# JYaml
+
 JYaml is a library for parsing yaml file using java.
-======
 
+## Test
 
-#### Test
-
-    gradle test --tests *YAMLTest
-    
-    
+```bash
+gradle test --tests *YAMLTest
+```

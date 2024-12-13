@@ -1,22 +1,27 @@
-plugins {
-    id "com.jfrog.bintray" version "1.8.4"
-    id "java"
+plugins {    
+    id "java"    
+    id "com.github.ben-manes.versions" version "0.51.0"
 }
 
-bintray {
-    user = System.getenv('BINTRAY_USER')
-    key = System.getenv('BINTRAY_KEY')
+// 使用toolchain 必须org.gradle.java.home需对应 gradle -q javaToolchains
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
-sourceCompatibility = 11
-targetCompatibility = 11
-
+compileJava {
+    options.encoding = 'UTF-8'
+    options.warnings = true
+    options.deprecation = true
+    //options.compilerArgs.addAll(["-XDignore.symbol.file", "-Xlint:deprecation", "-Xlint:unchecked", "-Xlint:all"])
+}
 dependencies {
-    compile("ch.qos.logback:logback-classic:${logback}")
-    testCompile("org.yaml:snakeyaml:${snakeyaml}", "junit:junit:${junit}")
+    implementation("ch.qos.logback:logback-classic:${logback}")
+    testImplementation("org.yaml:snakeyaml:${snakeyaml}", "junit:junit:${junit}")
 }
 
-task sampleTest(type: Test, dependsOn: testClasses) {
+task testAll(type: Test, dependsOn: testClasses) {
     include '**/*Test'
 }
 

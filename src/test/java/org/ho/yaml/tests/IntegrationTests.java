@@ -136,7 +136,7 @@ public class IntegrationTests extends TestCase {
         }
     }
 
-    //==== Utility Functions
+    // ==== Utility Functions
     <T> T thereAndBack(T o, String filename, YamlConfig config) {
         try {
             config.dump(o, new File(filename));
@@ -181,18 +181,18 @@ public class IntegrationTests extends TestCase {
         integrationTest(obj, name, validator, new YamlConfig());
 
     }
-    //==== Test Cases
+    // ==== Test Cases
 
-//  public void testJFrame() {
-//  final JFrame f = new JFrame("hey");
-//  integrationTest(f, "testJFrame", 
-//  new Validator<JFrame>(){
-//  public void validate(JFrame obj){
-//  assertEquals("hey", obj.getTitle());
-//  }
-//  }
-//  );
-//  }
+    // public void testJFrame() {
+    // final JFrame f = new JFrame("hey");
+    // integrationTest(f, "testJFrame",
+    // new Validator<JFrame>(){
+    // public void validate(JFrame obj){
+    // assertEquals("hey", obj.getTitle());
+    // }
+    // }
+    // );
+    // }
 
     public void testCollections() {
         HashSet<Integer> s = new HashSet<Integer>();
@@ -205,11 +205,9 @@ public class IntegrationTests extends TestCase {
                         assertTrue(s.contains(45));
                         assertEquals(s.size(), 2);
                     }
-                }
-        );
+                });
 
     }
-
 
     public void testCollectionsLong() {
         HashSet<Long> s = new HashSet<Long>();
@@ -218,8 +216,8 @@ public class IntegrationTests extends TestCase {
         integrationTest(s, "testCollectionsLong",
                 new Validator<HashSet>() {
                     public void validate(HashSet s) {
-                        assertTrue(s.contains(new Long(1)));
-                        assertTrue(s.contains(new Long(45)));
+                        assertTrue(s.contains(1L));
+                        assertTrue(s.contains(45L));
                         assertEquals(s.size(), 2);
                     }
                 });
@@ -253,9 +251,7 @@ public class IntegrationTests extends TestCase {
                     }
                 });
 
-
     }
-
 
     public void testCollectionNull() {
         ArrayList s = new ArrayList();
@@ -345,8 +341,8 @@ public class IntegrationTests extends TestCase {
         Integer one = 1;
         Integer two = 2;
         Integer three = 3;
-        List l1 = new ArrayList(Arrays.asList(new Object[]{one, two, three}));
-        List l2 = new ArrayList(Arrays.asList(new Object[]{l1, two, three}));
+        List l1 = new ArrayList(Arrays.asList(new Object[] { one, two, three }));
+        List l2 = new ArrayList(Arrays.asList(new Object[] { l1, two, three }));
         integrationTest(l2, "testReferences",
                 new Validator<List>() {
                     public void validate(List l2) {
@@ -361,8 +357,8 @@ public class IntegrationTests extends TestCase {
         Integer one = 1;
         Integer two = 2;
         Integer three = 3;
-        List l1 = new ArrayList(Arrays.asList(new Object[]{one, two, three}));
-        List l2 = new ArrayList(Arrays.asList(new Object[]{l1, two, three, l1}));
+        List l1 = new ArrayList(Arrays.asList(new Object[] { one, two, three }));
+        List l2 = new ArrayList(Arrays.asList(new Object[] { l1, two, three, l1 }));
         integrationTest(l2, "testReferencesLists",
                 new Validator<List>() {
                     public void validate(List l2) {
@@ -388,11 +384,10 @@ public class IntegrationTests extends TestCase {
                     }
                 });
 
-
     }
 
     public void testArrays() {
-        Integer[] a1 = new Integer[]{1, 2, 3, 4};
+        Integer[] a1 = new Integer[] { 1, 2, 3, 4 };
         integrationTest(a1, "testArrays",
                 new Validator<Integer[]>() {
                     public void validate(Integer[] a1) {
@@ -404,11 +399,10 @@ public class IntegrationTests extends TestCase {
                     }
                 });
 
-
     }
 
     public void testPrimitiveArrays() {
-        int[] a1 = new int[]{1, 2, 3, 4};
+        int[] a1 = new int[] { 1, 2, 3, 4 };
         integrationTest(a1, "testPrimitiveArrays",
                 new Validator<int[]>() {
                     public void validate(int[] a1) {
@@ -427,7 +421,7 @@ public class IntegrationTests extends TestCase {
         String s = "a";
         Person p = new Person();
         p.setName("Mike Dell");
-        Object[] a1 = new Object[]{1, s, 3, 4, new Object[]{s}, p};
+        Object[] a1 = new Object[] { 1, s, 3, 4, new Object[] { s }, p };
         integrationTest(a1, "testArrayWithinArray",
                 new Validator<Object[]>() {
                     public void validate(Object[] a1) {
@@ -437,7 +431,6 @@ public class IntegrationTests extends TestCase {
                 });
 
     }
-
 
     public void testColor() {
         Color c = new Color(2, 3, 4);
@@ -510,7 +503,7 @@ public class IntegrationTests extends TestCase {
                         assertEquals(c.getAssets(), new BigDecimal("2000045.40"));
                         assertEquals(c.getName(), "Microsoft Corporation");
                         assertEquals(c.getPresident().getName(), "Tony Hawk");
-                        assertEquals(c.getPresident().getAge(), new Integer(40));
+                        assertEquals(c.getPresident().getAge(), Integer.valueOf(40));
                         assertEquals(c.getPresident().getSalary(), 120000.00);
                         assertEquals(c.getPresident().getNetWorth(), new BigDecimal("238943443.00"));
                         assertEquals(c.getPresident().getSpouse().getName(), "Mrs. Hawk");
@@ -548,11 +541,11 @@ public class IntegrationTests extends TestCase {
                         assertEquals(c.getAssets(), new BigDecimal("2000045.40"));
                         assertEquals(c.getName(), "Microsoft Corporation");
                         assertEquals(c.getPresident().getName(), "Tony Hawk");
-                        assertEquals(c.getPresident().getAge(), new Integer(40));
+                        assertEquals(c.getPresident().getAge(), Integer.valueOf(40));
                         assertEquals(c.getPresident().getSalary(), 120000.00);
                         assertEquals(c.getPresident().getNetWorth(), new BigDecimal("238943443.00"));
                         assertEquals(c.getPresident().getSpouse().getName(), "Mrs. Hawk");
-                        assertEquals(c.getYearsInOperation(), 12);
+                        assertEquals(c.getYearsInOperation(), 12L);
                         assertEquals(c.getDepartmentArray()[0].getName(), "Engineering");
                         assertEquals(c.getDepartmentArray()[1].getName(), "Sales");
                         assertEquals(c.getDepartmentArray()[2].getName(), "Marketing");
@@ -658,7 +651,6 @@ public class IntegrationTests extends TestCase {
         }
     }
 
-
     public void testMultiLineString() {
         String s = "hello\nworld";
         integrationTest(s, "testMultiLineString",
@@ -700,21 +692,20 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testWebSiteExample() throws Exception {
-        String yamlText =
+        String yamlText = "---\n" +
+                "date: 11/30/2005\n" +
+                "receipts:\n" +
+                "    -\n" +
+                "        store: la madeleine\n" +
+                "        category: \"dining out: lunch\"\n" +
+                "        total: 13.14\n" +
                 "---\n" +
-                        "date: 11/30/2005\n" +
-                        "receipts:\n" +
-                        "    -\n" +
-                        "        store: la madeleine\n" +
-                        "        category: \"dining out: lunch\"\n" +
-                        "        total: 13.14\n" +
-                        "---\n" +
-                        "date: 12/1/2005\n" +
-                        "receipts:\n" +
-                        "    -\n" +
-                        "        store: sushi me\n" +
-                        "        category: \"dining out: lunch\"\n" +
-                        "        total: 5.60";
+                "date: 12/1/2005\n" +
+                "receipts:\n" +
+                "    -\n" +
+                "        store: sushi me\n" +
+                "        category: \"dining out: lunch\"\n" +
+                "        total: 5.60";
         YamlDecoder dec = new YamlDecoder(new StringBufferInputStream(yamlText));
         Map map = (Map) dec.readObject();
         assertEquals("11/30/2005", map.get("date"));
@@ -736,21 +727,20 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testWebSiteExampleJavaBeans() throws Exception {
-        String yamlText =
+        String yamlText = "---\n" +
+                "date: 11/30/2005\n" +
+                "receipts:\n" +
+                "    -\n" +
+                "        store: la madeleine\n" +
+                "        category: \"dining out: lunch\"\n" +
+                "        total: 13.14\n" +
                 "---\n" +
-                        "date: 11/30/2005\n" +
-                        "receipts:\n" +
-                        "    -\n" +
-                        "        store: la madeleine\n" +
-                        "        category: \"dining out: lunch\"\n" +
-                        "        total: 13.14\n" +
-                        "---\n" +
-                        "date: 12/1/2005\n" +
-                        "receipts:\n" +
-                        "    -\n" +
-                        "        store: sushi me\n" +
-                        "        category: \"dining out: lunch\"\n" +
-                        "        total: 5.60";
+                "date: 12/1/2005\n" +
+                "receipts:\n" +
+                "    -\n" +
+                "        store: sushi me\n" +
+                "        category: \"dining out: lunch\"\n" +
+                "        total: 5.60";
         YamlDecoder dec = new YamlDecoder(new StringBufferInputStream(yamlText));
         Entry entry = dec.readObjectOfType(Entry.class);
         assertEquals("11/30/2005", entry.getDate());
@@ -770,19 +760,18 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testWebSiteExampleSameLineOpenMap() throws Exception {
-        String yamlText =
+        String yamlText = "---\n" +
+                "date: 11/30/2005\n" +
+                "receipts:\n" +
+                "    -   store: la madeleine\n" +
+                "        category: \"dining out: lunch\"\n" +
+                "        total: 13.14\n" +
                 "---\n" +
-                        "date: 11/30/2005\n" +
-                        "receipts:\n" +
-                        "    -   store: la madeleine\n" +
-                        "        category: \"dining out: lunch\"\n" +
-                        "        total: 13.14\n" +
-                        "---\n" +
-                        "date: 12/1/2005\n" +
-                        "receipts:\n" +
-                        "    -   store: sushi me\n" +
-                        "        category: \"dining out: lunch\"\n" +
-                        "        total: 5.60";
+                "date: 12/1/2005\n" +
+                "receipts:\n" +
+                "    -   store: sushi me\n" +
+                "        category: \"dining out: lunch\"\n" +
+                "        total: 5.60";
         YamlDecoder dec = new YamlDecoder(new StringBufferInputStream(yamlText));
         Entry entry = dec.readObjectOfType(Entry.class);
         assertEquals("11/30/2005", entry.getDate());
@@ -802,19 +791,18 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testWebSiteExampleFreeStrings() throws Exception {
-        String yamlText =
+        String yamlText = "---\n" +
+                "date: 11/30/2005\n" +
+                "receipts:\n" +
+                "    -   store: la madeleine\n" +
+                "        category: dining out: lunch\n" +
+                "        total: 13.14\n" +
                 "---\n" +
-                        "date: 11/30/2005\n" +
-                        "receipts:\n" +
-                        "    -   store: la madeleine\n" +
-                        "        category: dining out: lunch\n" +
-                        "        total: 13.14\n" +
-                        "---\n" +
-                        "date: 12/1/2005\n" +
-                        "receipts:\n" +
-                        "    -   store: sushi me\n" +
-                        "        category: dining out: lunch\n" +
-                        "        total: 5.60";
+                "date: 12/1/2005\n" +
+                "receipts:\n" +
+                "    -   store: sushi me\n" +
+                "        category: dining out: lunch\n" +
+                "        total: 5.60";
         YamlDecoder dec = new YamlDecoder(new StringBufferInputStream(yamlText));
         Entry entry = dec.readObjectOfType(Entry.class);
         assertEquals("11/30/2005", entry.getDate());
@@ -834,17 +822,16 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testWebSiteExample2() throws Exception {
-        String yamlText =
-                "--- \n" +
-                        "date: 11/29/2005\n" +
-                        "receipts:\n" +
-                        "    -   store: ken stanton music\n" +
-                        "        category: entertainment\n" +
-                        "        description: saxophone repair\n" +
-                        "        total: 382.00\n" +
-                        "    -   store: walmart\n" +
-                        "        category: groceries\n" +
-                        "        total: 14.26";
+        String yamlText = "--- \n" +
+                "date: 11/29/2005\n" +
+                "receipts:\n" +
+                "    -   store: ken stanton music\n" +
+                "        category: entertainment\n" +
+                "        description: saxophone repair\n" +
+                "        total: 382.00\n" +
+                "    -   store: walmart\n" +
+                "        category: groceries\n" +
+                "        total: 14.26";
         Entry entry = Yaml.loadType(yamlText, Entry.class);
         assertEquals("11/29/2005", entry.getDate());
         assertEquals(2, entry.getReceipts().length);
@@ -856,17 +843,16 @@ public class IntegrationTests extends TestCase {
 
     public void testWebSiteExample2WithRealDate() throws Exception {
         DateFormat fmt = new SimpleDateFormat("MM/dd/yyyy");
-        String yamlText =
-                "--- \n" +
-                        "date: 11/29/2005\n" +
-                        "receipts:\n" +
-                        "    -   store: ken stanton music\n" +
-                        "        category: entertainment\n" +
-                        "        description: saxophone repair\n" +
-                        "        total: 382.00\n" +
-                        "    -   store: walmart\n" +
-                        "        category: groceries\n" +
-                        "        total: 14.26";
+        String yamlText = "--- \n" +
+                "date: 11/29/2005\n" +
+                "receipts:\n" +
+                "    -   store: ken stanton music\n" +
+                "        category: entertainment\n" +
+                "        description: saxophone repair\n" +
+                "        total: 382.00\n" +
+                "    -   store: walmart\n" +
+                "        category: groceries\n" +
+                "        total: 14.26";
         Entry2 entry = Yaml.loadType(yamlText, Entry2.class);
         assertEquals(fmt.parse("11/29/2005"), entry.getDate());
         assertEquals(2, entry.getReceipts().length);
@@ -876,54 +862,47 @@ public class IntegrationTests extends TestCase {
 
     }
 
-
     public void testSkimoEx1() {
-        String yamlText =
-                "---\n" +
-                        "cacheline: -1";
+        String yamlText = "---\n" +
+                "cacheline: -1";
         Map m = (Map) Yaml.load(yamlText);
         assertEquals(m.get("cacheline"), -1);
     }
 
     public void testSkimoEx2() {
-        String yamlText =
-                "---\n" +
-                        "cacheline: 1";
+        String yamlText = "---\n" +
+                "cacheline: 1";
         Map m = (Map) Yaml.load(yamlText);
         assertEquals(m.get("cacheline"), 1);
     }
 
     public void testSkimoEx3() {
-        String yamlText =
-                "---\n" +
-                        "cacheline: -1.5";
+        String yamlText = "---\n" +
+                "cacheline: -1.5";
         Map m = (Map) Yaml.load(yamlText);
         assertEquals(m.get("cacheline"), -1.5);
     }
 
     public void testNegativenumberAsKey() {
-        String yamlText =
-                "---\n" +
-                        "-1: -1.5";
+        String yamlText = "---\n" +
+                "-1: -1.5";
         Map m = (Map) Yaml.load(yamlText);
         System.out.println(m);
         assertEquals(m.get(-1), -1.5);
     }
 
     public void testNnumberAsKey() {
-        String yamlText =
-                "---\n" +
-                        "1: -1.5";
+        String yamlText = "---\n" +
+                "1: -1.5";
         Map m = (Map) Yaml.load(yamlText);
         System.out.println(m);
         assertEquals(-1.5, m.get(1));
     }
 
     public void testIterable() {
-        String yamlText =
-                "--- 1\n" +
-                        "--- 2\n" +
-                        "--- 3";
+        String yamlText = "--- 1\n" +
+                "--- 2\n" +
+                "--- 3";
         int i = 1;
         YamlStream col = Yaml.loadStream(yamlText);
         for (Object o : col) {
@@ -933,16 +912,15 @@ public class IntegrationTests extends TestCase {
         i = 1;
         for (Object o : col) {
             throw new RuntimeException("should not get here");
-//          assertEquals(i, o);
-//          i++;
+            // assertEquals(i, o);
+            // i++;
         }
     }
 
     public void testIterator() {
-        String yamlText =
-                "--- 1\n" +
-                        "--- 2\n" +
-                        "--- 3";
+        String yamlText = "--- 1\n" +
+                "--- 2\n" +
+                "--- 3";
         int i = 1;
         Iterator iterable = Yaml.loadStream(yamlText);
         while (iterable.hasNext()) {
@@ -952,11 +930,11 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testMultiDimensionalArrays() {
-        int[][] a = new int[][]{
-                {1, 2, 3, 4},
-                {5, 6, 7, 8},
-                {9, 10, 11, 12},
-                {13, 14, 15, 16}
+        int[][] a = new int[][] {
+                { 1, 2, 3, 4 },
+                { 5, 6, 7, 8 },
+                { 9, 10, 11, 12 },
+                { 13, 14, 15, 16 }
         };
         integrationTest(a, "testMultiDimensionalArrays",
                 new Validator<int[][]>() {
@@ -970,11 +948,11 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testMultiDimensionalArrays2() {
-        int[][][] a = new int[][][]{{
-                {1, 2, 3, 4},
-                {5, 6, 7, 8},
-                {9, 10, 11, 12},
-                {13, 14, 15, 16}
+        int[][][] a = new int[][][] { {
+                { 1, 2, 3, 4 },
+                { 5, 6, 7, 8 },
+                { 9, 10, 11, 12 },
+                { 13, 14, 15, 16 }
         }
         };
         integrationTest(a, "testMultiDimensionalArrays",
@@ -1002,7 +980,7 @@ public class IntegrationTests extends TestCase {
                 new Validator<Record>() {
                     public void validate(Record r) {
                         assertEquals("John Smith", r.name);
-                        assertEquals(new Integer(4), r.age);
+                        assertEquals(Integer.valueOf(4), r.age);
                     }
                 });
     }
@@ -1018,117 +996,109 @@ public class IntegrationTests extends TestCase {
                 new Validator<Record>() {
                     public void validate(Record r) {
                         assertEquals("John Smith", r.name);
-                        assertEquals(new Integer(4), r.age);
+                        assertEquals(Integer.valueOf(4), r.age);
                         assertEquals("Jane Smith", r.next.name);
                     }
                 });
     }
 
     public void testMapInList() {
-        String yamlText =
-                "- one\n" +
-                        "- two\n" +
-                        "- three: four\n" +
-                        "  five: six";
+        String yamlText = "- one\n" +
+                "- two\n" +
+                "- three: four\n" +
+                "  five: six";
         List list = (List) Yaml.load(yamlText);
         assertEquals("four", ((Map) list.get(2)).get("three"));
         assertEquals("six", ((Map) list.get(2)).get("five"));
     }
 
     public void testNonExistentField() {
-        String yamlText =
-                "name: John Smith\n" +
-                        "age: 4\n" +
-                        "area: 44";
+        String yamlText = "name: John Smith\n" +
+                "age: 4\n" +
+                "area: 44";
         Record r = Yaml.loadType(yamlText, Record.class);
         assertEquals("John Smith", r.name);
-        assertEquals(new Integer(4), r.age);
+        assertEquals(Integer.valueOf(4), r.age);
     }
 
     public void testNonExistentProperty() {
-        String yamlText =
-                "date: 11/12/03\n" +
-                        "age: 4\n" +
-                        "area: 44";
+        String yamlText = "date: 11/12/03\n" +
+                "age: 4\n" +
+                "area: 44";
         Entry r = Yaml.loadType(yamlText, Entry.class);
         assertEquals("11/12/03", r.getDate());
     }
 
     public void testNonExistentListProperty() {
-        String yamlText =
-                "date: 11/12/03\n" +
-                        "age: 4\n" +
-                        "children:\n" +
-                        "  - john\n" +
-                        "  - joe\n";
+        String yamlText = "date: 11/12/03\n" +
+                "age: 4\n" +
+                "children:\n" +
+                "  - john\n" +
+                "  - joe\n";
         Entry r = Yaml.loadType(yamlText, Entry.class);
         assertEquals("11/12/03", r.getDate());
     }
 
     public void testSkimoInlinedList() {
-        String yamlText =
-                "---\n" +
-                        "arrays:\n" +
-                        " - &1\n" +
-                        "   dims:\n" +
-                        "     - 10\n" +
-                        "   id: 1610612737\n" +
-                        "   name: a\n" +
-                        "cacheline: -1\n" +
-                        "context:\n" +
-                        " constraints:\n" +
-                        "   -\n" +
-                        "     - [1, 1, 0]\n" +
-                        "     - [1, -1, 2]\n" +
-                        " dim: 0\n" +
-                        " params:\n" +
-                        "   - &2\n" +
-                        "     name: n\n";
+        String yamlText = "---\n" +
+                "arrays:\n" +
+                " - &1\n" +
+                "   dims:\n" +
+                "     - 10\n" +
+                "   id: 1610612737\n" +
+                "   name: a\n" +
+                "cacheline: -1\n" +
+                "context:\n" +
+                " constraints:\n" +
+                "   -\n" +
+                "     - [1, 1, 0]\n" +
+                "     - [1, -1, 2]\n" +
+                " dim: 0\n" +
+                " params:\n" +
+                "   - &2\n" +
+                "     name: n\n";
         PDG pdg = Yaml.loadType(yamlText, PDG.class);
         assertEquals("-1", pdg.cacheline);
     }
 
     public void testSkimoIgnoreTransfers() {
-        String yamlText =
-                "--- !perl/PDG\n" +
-                        "arrays:\n" +
-                        " - &1\n" +
-                        "   dims:\n" +
-                        "     - 10\n" +
-                        "   id: 1610612737\n" +
-                        "   name: a\n" +
-                        "cacheline: -1\n" +
-                        "context: !perl/PDG::UnionSet\n" +
-                        " constraints:\n" +
-                        "   - !perl/PDL::Matrix\n" +
-                        "     - [1, 1, 0]\n" +
-                        "     - [1, -1, 2]\n" +
-                        " dim: 0\n" +
-                        " params:\n" +
-                        "   - &2\n" +
-                        "     name: n\n";
+        String yamlText = "--- !perl/PDG\n" +
+                "arrays:\n" +
+                " - &1\n" +
+                "   dims:\n" +
+                "     - 10\n" +
+                "   id: 1610612737\n" +
+                "   name: a\n" +
+                "cacheline: -1\n" +
+                "context: !perl/PDG::UnionSet\n" +
+                " constraints:\n" +
+                "   - !perl/PDL::Matrix\n" +
+                "     - [1, 1, 0]\n" +
+                "     - [1, -1, 2]\n" +
+                " dim: 0\n" +
+                " params:\n" +
+                "   - &2\n" +
+                "     name: n\n";
         PDG pdg = Yaml.loadType(yamlText, PDG.class);
         assertEquals("-1", pdg.cacheline);
     }
 
     public void testSkimoNegativeInList() {
-        String yamlText =
-                "---\n" +
-                        "prefix:\n" +
-                        " - 1\n" +
-                        " - -1\n" +
-                        " - 1";
+        String yamlText = "---\n" +
+                "prefix:\n" +
+                " - 1\n" +
+                " - -1\n" +
+                " - 1";
         Map map = (Map) Yaml.load(yamlText);
         assertEquals(-1, ((List) map.get("prefix")).get(1));
     }
 
     public void testArrayInArray() {
-        String yamlText =
-                "---\n" +
-                        "nodes:\n" +
-                        " -\n" +
-                        "   nr: -1\n" +
-                        "   prefix: [1, -1, 1]";
+        String yamlText = "---\n" +
+                "nodes:\n" +
+                " -\n" +
+                "   nr: -1\n" +
+                "   prefix: [1, -1, 1]";
         PDG pdg = Yaml.loadType(yamlText, PDG.class);
         assertNotNull(pdg);
         assertEquals(1, pdg.nodes.length);
@@ -1138,14 +1108,13 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testSkimoArray() {
-        String yamlText =
-                "---\n" +
-                        "context:\n" +
-                        " constraints:\n" +
-                        "   -\n" +
-                        "     - [1, 1, 0]\n" +
-                        "     - [1, -1, 2]\n" +
-                        " dim: 0";
+        String yamlText = "---\n" +
+                "context:\n" +
+                " constraints:\n" +
+                "   -\n" +
+                "     - [1, 1, 0]\n" +
+                "     - [1, -1, 2]\n" +
+                " dim: 0";
         PDG pdg = Yaml.loadType(yamlText, PDG.class);
         assertEquals(pdg.context.dim, 0);
         assertEquals(pdg.context.constraints[0][0][0], 1);
@@ -1157,23 +1126,21 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testEmptyInlinedLists() {
-        String yamlText =
-                "---\n" +
-                        "- []";
+        String yamlText = "---\n" +
+                "- []";
         List list = Yaml.loadType(yamlText, ArrayList.class);
         assertEquals(0, ((List) list.get(0)).size());
     }
 
     public void testAnchorIgnored() {
-        String yamlText =
-                "---\n" +
-                        "ignored:\n" +
-                        " - &1\n" +
-                        "   dims: []\n" +
-                        "   id: 1610612737\n" +
-                        "   name: a\n" +
-                        "arrays:\n" +
-                        " - *1";
+        String yamlText = "---\n" +
+                "ignored:\n" +
+                " - &1\n" +
+                "   dims: []\n" +
+                "   id: 1610612737\n" +
+                "   name: a\n" +
+                "arrays:\n" +
+                " - *1";
         try {
             PDG pdg = Yaml.loadType(yamlText, PDG.class);
             assertEquals(pdg.arrays[0].name, "a");
@@ -1197,9 +1164,8 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testArrayInList() {
-        String yamlText =
-                "- !int[] [1,2,3]\n" +
-                        "- 2";
+        String yamlText = "- !int[] [1,2,3]\n" +
+                "- 2";
         List list = (List) Yaml.load(yamlText);
         assertEquals(list.size(), 2);
         assertEquals(((int[]) list.get(0))[0], 1);
@@ -1207,7 +1173,9 @@ public class IntegrationTests extends TestCase {
         assertEquals(((int[]) list.get(0))[2], 3);
     }
 
-    public enum Suit {SPADE, HEART, CLUB, DIAMOND}
+    public enum Suit {
+        SPADE, HEART, CLUB, DIAMOND
+    }
 
     ;
 
@@ -1253,7 +1221,7 @@ public class IntegrationTests extends TestCase {
         NEPTUNE(1.024e+26, 2.4746e7),
         PLUTO(1.27e+22, 1.137e6);
 
-        private final double mass;   // in kilograms
+        private final double mass; // in kilograms
         private final double radius; // in meters
 
         Planet(double mass, double radius) {
@@ -1269,7 +1237,7 @@ public class IntegrationTests extends TestCase {
             return radius;
         }
 
-        // universal gravitational constant  (m3 kg-1 s-2)
+        // universal gravitational constant (m3 kg-1 s-2)
         public static final double G = 6.67300E-11;
 
         public double surfaceGravity() {
@@ -1300,7 +1268,6 @@ public class IntegrationTests extends TestCase {
                     }
                 });
     }
-
 
     public void testComplexEnumArray() {
         // bug with inter-classes in arrays
@@ -1380,11 +1347,10 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testDanielsBug() {
-        String yamlText =
-                "-\n" +
-                        "  msg: \"\\\\ foo\"\n" +
-                        "  handle: firefox\n" +
-                        "  id: 4";
+        String yamlText = "-\n" +
+                "  msg: \"\\\\ foo\"\n" +
+                "  handle: firefox\n" +
+                "  id: 4";
         System.out.println(yamlText);
         List list = (List) Yaml.load(yamlText);
         assertEquals(list.size(), 1);
@@ -1395,11 +1361,10 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testDanielsBug2() {
-        String yamlText =
-                "-\n" +
-                        "  msg: '\\\\ foo'\n" +
-                        "  handle: firefox\n" +
-                        "  id: 4";
+        String yamlText = "-\n" +
+                "  msg: '\\\\ foo'\n" +
+                "  handle: firefox\n" +
+                "  id: 4";
         System.out.println(yamlText);
         List list = (List) Yaml.load(yamlText);
         assertEquals(list.size(), 1);
@@ -1410,11 +1375,10 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testDanielsBug3() {
-        String yamlText =
-                "-\n" +
-                        "  msg: \\\\ foo\n" +
-                        "  handle: firefox\n" +
-                        "  id: 4";
+        String yamlText = "-\n" +
+                "  msg: \\\\ foo\n" +
+                "  handle: firefox\n" +
+                "  id: 4";
         System.out.println(yamlText);
         List list = (List) Yaml.load(yamlText);
         assertEquals(list.size(), 1);
@@ -1425,11 +1389,10 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testSingleQuotes() {
-        String yamlText =
-                "-\n" +
-                        "  msg: 'hello world'\n" +
-                        "  handle: firefox\n" +
-                        "  id: 4";
+        String yamlText = "-\n" +
+                "  msg: 'hello world'\n" +
+                "  handle: firefox\n" +
+                "  id: 4";
         System.out.println(yamlText);
         List list = (List) Yaml.load(yamlText);
         assertEquals(list.size(), 1);
@@ -1520,14 +1483,13 @@ public class IntegrationTests extends TestCase {
         }
     }
 
-//    public void testAutoConstructor(){
-//        String yamlText =
-//            "- one\n" +
-//            "- !org.ho.yaml.tests.IntegrationTests$OneArgConstructor 4";
-//        List l = (List)Yaml.load(yamlText);
-//        assertEquals(4, ((OneArgConstructor)l.get(1)).i);
-//    }
-
+    // public void testAutoConstructor(){
+    // String yamlText =
+    // "- one\n" +
+    // "- !org.ho.yaml.tests.IntegrationTests$OneArgConstructor 4";
+    // List l = (List)Yaml.load(yamlText);
+    // assertEquals(4, ((OneArgConstructor)l.get(1)).i);
+    // }
 
     /**
      * Handling of type Short was broken before 4 June 2006.
@@ -1652,7 +1614,8 @@ public class IntegrationTests extends TestCase {
     }
 
     /**
-     * Tests that the YamlConfig is correctly saved/loaded, including the date format
+     * Tests that the YamlConfig is correctly saved/loaded, including the date
+     * format
      *
      * @author Steve Leach
      */
@@ -1689,7 +1652,6 @@ public class IntegrationTests extends TestCase {
                     }
                 }, config);
 
-
     }
 
     public static class PrivateFields {
@@ -1712,7 +1674,6 @@ public class IntegrationTests extends TestCase {
                         assertEquals("five", p.svalue);
                     }
                 }, config);
-
 
     }
 
@@ -1897,7 +1858,7 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testEmptyStringInArrays() {
-        String[] arr = new String[]{""};
+        String[] arr = new String[] { "" };
         integrationTest(arr, "testEmptyStringInArrays",
                 new Validator<String[]>() {
                     public void validate(String[] arr) {
@@ -1912,7 +1873,8 @@ public class IntegrationTests extends TestCase {
         integrationTest(m, "testSingleQuotesBug",
                 new Validator<Map>() {
                     public void validate(Map m) {
-                        assertEquals("string", "Then he said, 'This is a sentence surrounded by single quotes'", m.get("string"));
+                        assertEquals("string", "Then he said, 'This is a sentence surrounded by single quotes'",
+                                m.get("string"));
                     }
                 });
     }
@@ -1937,10 +1899,11 @@ public class IntegrationTests extends TestCase {
         System.out.println(yamlText);
     }
 
-//    public void testMapWithSequence(){
-//        Map doc = (Map) Yaml.load("key:\n- element1\n- element2"); // I guess this is not that important since "key:\n  - element1\n  - element2" works
-//        System.out.println(doc.get("key"));
-//    }
+    // public void testMapWithSequence(){
+    // Map doc = (Map) Yaml.load("key:\n- element1\n- element2"); // I guess this is
+    // not that important since "key:\n - element1\n - element2" works
+    // System.out.println(doc.get("key"));
+    // }
 
     public void testDateBug() {
         String s = "---\n" +
@@ -1951,7 +1914,7 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testEriksBug() {
-        final String more_data[] = {"\nfoo\nbar\n\nfoobar\n\n\n\n\n\n\nmuch space above me?"};
+        final String more_data[] = { "\nfoo\nbar\n\nfoobar\n\n\n\n\n\n\nmuch space above me?" };
         System.out.println(more_data[0]);
         HashMap m = new HashMap();
         m.put("Foo", more_data);
@@ -2100,7 +2063,8 @@ public class IntegrationTests extends TestCase {
                 "  ip: 83.102.170.99\n" +
                 "  counter: 1";
         Map m = (Map) Yaml.load(s);
-        assertEquals("Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3 ip: 83.102.170.99 counter: 1 ",
+        assertEquals(
+                "Mozilla/5.0 (Windows; U; Windows NT 5.1; ru; rv:1.8.1.3) Gecko/20070309 Firefox/2.0.0.3 ip: 83.102.170.99 counter: 1 ",
                 m.get("ua"));
     }
 
@@ -2254,32 +2218,28 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testOneSpaceIndent() {
-        String yamlText =
-                "---\n" +
-                        "one: \n" +
-                        " - 1\n" +
-                        " - 2\n";
+        String yamlText = "---\n" +
+                "one: \n" +
+                " - 1\n" +
+                " - 2\n";
         Map m = (Map) Yaml.load(yamlText);
         assertEquals(1, ((List) m.get("one")).get(0));
         assertEquals(2, ((List) m.get("one")).get(1));
     }
 
     public void testOneLineMaps() {
-        String yamlText =
-                "---\n" +
-                        "- 1\n" +
-                        "- one: two\n";
+        String yamlText = "---\n" +
+                "- 1\n" +
+                "- one: two\n";
         List l = (List) Yaml.load(yamlText);
         assertEquals("two", ((Map) l.get(1)).get("one"));
     }
 
-
     public void testOneLineMaps2() {
-        String yamlText =
-                "---\n" +
-                        "one:\n" +
-                        " - 1\n" +
-                        " - one: two\n";
+        String yamlText = "---\n" +
+                "one:\n" +
+                " - 1\n" +
+                " - one: two\n";
         Map m = (Map) Yaml.load(yamlText);
         assertEquals("two", ((Map) ((List) m.get("one")).get(1)).get("one"));
     }
@@ -2291,12 +2251,11 @@ public class IntegrationTests extends TestCase {
         p.setSalary(34859.0);
         p.setNetWorth(new BigDecimal("1000000.00"));
         System.out.println(Yaml.dump(p, true));
-        String expected =
-                "--- \r\n" +
-                        "age: 4\r\n" +
-                        "name: kevin\r\n" +
-                        "netWorth: 1000000.00\r\n" +
-                        "salary: 34859.0\r\n";
+        String expected = "--- \r\n" +
+                "age: 4\r\n" +
+                "name: kevin\r\n" +
+                "netWorth: 1000000.00\r\n" +
+                "salary: 34859.0\r\n";
 
         assertEquals(expected, Yaml.dump(p, true));
     }
@@ -2403,10 +2362,9 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testListsShouldntNeedIndentationInsideMap() {
-        String yamlText =
-                "map:\n" +
-                        "- one\n" +
-                        "- two\n";
+        String yamlText = "map:\n" +
+                "- one\n" +
+                "- two\n";
         Map m = (Map) Yaml.load(yamlText);
         System.out.println(m);
         assertEquals(0, ((List) m.get("map")).size());
@@ -2451,9 +2409,8 @@ public class IntegrationTests extends TestCase {
     }
 
     public void testShouldEspaceSlashes() {
-        final String yamlText =
-                "--- \n" +
-                        "- \"\\\\t\"\n";
+        final String yamlText = "--- \n" +
+                "- \"\\\\t\"\n";
         System.out.println(yamlText);
         List l = (List) Yaml.load(yamlText);
         assertEquals("\\t", l.get(0));

@@ -49,7 +49,7 @@ public abstract class AbstractWrapper implements ObjectWrapper {
 	protected Object createObject() {
 		try {
 			if (config.isConstructorAccessibleForDecoding(type)) {
-				Constructor constr = type.getDeclaredConstructor(null);
+				Constructor constr = type.getDeclaredConstructor();
 				constr.setAccessible(true);
 				return constr.newInstance();
 			} else

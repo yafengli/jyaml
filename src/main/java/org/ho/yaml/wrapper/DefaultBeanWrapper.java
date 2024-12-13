@@ -53,7 +53,7 @@ public class DefaultBeanWrapper extends AbstractWrapper implements MapWrapper {
 			if (config.isPropertyAccessibleForEncoding(prop)) {
 				Method rm = prop.getReadMethod();
 				rm.setAccessible(true);
-				return rm.invoke(obj, null);
+				return rm.invoke(obj);
 			}
 		} catch (Exception e) {
 		}
@@ -74,7 +74,7 @@ public class DefaultBeanWrapper extends AbstractWrapper implements MapWrapper {
 			if (config.isPropertyAccessibleForEncoding(prop)) {
 				Method wm = prop.getWriteMethod();
 				wm.setAccessible(true);
-				wm.invoke(getObject(), new Object[]{value});
+				wm.invoke(getObject(), new Object[] { value });
 				return;
 			}
 

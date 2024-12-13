@@ -81,8 +81,9 @@ public class YamlConfig implements YamlOperations, Cloneable {
    * @return the default Jyaml configuration
    */
   public static YamlConfig getDefaultConfig() {
-    return defaultConfig == null ? null : (YamlConfig) defaultConfig
-        .clone();
+    return defaultConfig == null ? null
+        : (YamlConfig) defaultConfig
+            .clone();
   }
 
   String indentAmount = "  ";
@@ -93,7 +94,7 @@ public class YamlConfig implements YamlOperations, Cloneable {
 
   BiDirectionalMap<String, String> transfers = null;
 
-  //private String dateFormat = null;
+  // private String dateFormat = null;
   private String dateFormat = "yyyy-MM-dd";
   private DateFormat dateFormatter = null;
 
@@ -285,8 +286,8 @@ public class YamlConfig implements YamlOperations, Cloneable {
       try {
         return (ObjectWrapper) ReflectionUtil
             .classForName((String) handler)
-            .getConstructor(new Class[]{Class.class})
-            .newInstance(new Object[]{type});
+            .getConstructor(new Class[] { Class.class })
+            .newInstance(new Object[] { type });
       } catch (Exception e) {
         throw new YamlException("Error initializing Wrapper " + handler
             + " for type " + type, e);
@@ -623,18 +624,18 @@ public class YamlConfig implements YamlOperations, Cloneable {
   public boolean isFieldAccessibleForDecoding(Field field) {
     return ReflectionUtil.isMemberField(field)
         && isWithin(field.getModifiers(),
-        decodingAccessScope.get(FIELD_SCOPE));
+            decodingAccessScope.get(FIELD_SCOPE));
   }
 
   public boolean isFieldAccessibleForEncoding(Field field) {
     return ReflectionUtil.isMemberField(field)
         && isWithin(field.getModifiers(),
-        encodingAccessScope.get(FIELD_SCOPE));
+            encodingAccessScope.get(FIELD_SCOPE));
   }
 
   public boolean isConstructorAccessibleForDecoding(Class clazz) {
     try {
-      Constructor constr = clazz.getDeclaredConstructor(null);
+      Constructor constr = clazz.getDeclaredConstructor();
       return isWithin(constr.getModifiers(),
           decodingAccessScope.get(CONSTRUCTOR_SCOPE));
     } catch (Exception e) {

@@ -3,6 +3,7 @@
 .classes*
 .project
 .settings/
+build/
 target/
 bin/
 out/
